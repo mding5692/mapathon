@@ -20,8 +20,12 @@
     
     <script>
     
-    /* Global variable for the map */
-    var map;
+    /*** Global variables ***/
+    var map; // To reference the map
+    var year; // To store the year chosen (e.g: 2014, 2015)
+    var month; // To store the month chosen (e.g: Aug or 08 or 09)
+    
+    /*** Functions ***/
     
     /**
      * Pops out loading screen while loading the points on the map
@@ -32,29 +36,42 @@
     
     /**
      * Creates url depending on which month is pressed
+     * Returns the URL
      **/
-    function createURLWhenMonthIsSpecified() {
-      
+    function createURLWhenMonthIsSpecifiedForHackalistAPI() {
+      yearStr = year.toString();
+      monthStr = month.toString();
+      var URL = "http://www.hackalist.org/api/1.0/" + yearStr + "/" + monthStr + ".json";
+      return URL;
     }
     
     /**
      * Gets the JSON data from Hackalist API
+     * Returns as JSON
      **/
     function grabJSONFromHackalist() {
       var JSONrequest = new XMLHttpRequest();
       JSONrequest.open("GET","http://www.hackalist.org/api/1.0/2014/08.json", false);
       JSONrequest.send();
       JSONresponse = JSONrequest.responseText;
-      
-      document.write(JSONresponse);
-      
+      var JSONToBeReturned = JSON.parse(JSONresponse);
+      return JSONToBeReturned;
     }
     
     /**
-     * Plots the point using geocoding 
+     * Gets the relevant information we need from Hackalist JSON
+     * Returns as JSON with relevant information
      **/
-    function plotWithGeocoding() {
-      
+    
+    /**
+     * Converts the Addresses into LatLng format with Geocoding
+     * Takes JSON data as Input where address information is used
+     * Returns an array of LatLngs
+     **/
+    function convertAddressesWithGeocoding(JSONInput) {
+      var newlatLngArray = [];
+      var address = JSONInput.city;
+      return address;
     }
     /**
      * Creates the map; see this as the main function
@@ -65,7 +82,10 @@
         center: {lat: -34.397, lng: 150.644}
       });
       
-      grabJSONFromHackalist();
+      var latLngArray = [];
+      var JSONFromHackalist = grabJSONFromHackalist();
+      latLngArray = convertAddressesWithGeocoding(JSONFromHackalist);
+      document.write(latLngArray[0]);
     }
     google.maps.event.addDomListener(window, 'load', initialize);
       
