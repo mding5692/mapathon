@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
   <head>
@@ -12,8 +11,10 @@
   <body>
     
     <style>
-      #map_canvas {
+      html, body, #map_canvas {
         height: 100%;
+        padding: 0;
+        margin: 0;
       }
       
     </style>
@@ -54,7 +55,7 @@
       JSONrequest.open("GET","http://www.hackalist.org/api/1.0/2014/08.json", false);
       JSONrequest.send();
       JSONresponse = JSONrequest.responseText;
-      var JSONToBeReturned = JSON.stringify(JSONresponse);
+      var JSONToBeReturned = JSON.parse(JSONresponse);
       return JSONToBeReturned;
     }
     
@@ -70,7 +71,7 @@
      **/
     function convertAddressesWithGeocoding(JSONInput) {
       var newlatLngArray = [];
-      var address = JSONInput.city;
+      var address = JSONInput.August[0].city;;
       return address;
     }
     /**
@@ -78,14 +79,14 @@
      **/
     function initialize() {
       map = new google.maps.Map(document.getElementById('map_canvas'), {
-        zoom: 8,
+        zoom: 4,
         center: {lat: -34.397, lng: 150.644}
       });
       
       var latLngArray = [];
       var JSONFromHackalist = grabJSONFromHackalist();
       var test = convertAddressesWithGeocoding(JSONFromHackalist);
-      document.write(test);
+      //document.write(test);
     }
     google.maps.event.addDomListener(window, 'load', initialize);
       
@@ -94,4 +95,3 @@
     
     <div id="map_canvas"></div>
   </body>
-</html>
