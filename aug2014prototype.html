@@ -44,7 +44,11 @@
      **/
     function grabJSONFromHackalist() {
       var JSONrequest = new XMLHttpRequest();
-      JSONrequest.open("GET","http://www.hackalist.org/api/1.0/2014/08.json", false)
+      JSONrequest.open("GET","http://www.hackalist.org/api/1.0/2014/08.json", false);
+      JSONrequest.send();
+      JSONresponse = JSONrequest.responseText;
+      
+      document.write(JSONresponse);
       
     }
     
@@ -62,6 +66,8 @@
         zoom: 8,
         center: {lat: -34.397, lng: 150.644}
       });
+      
+      grabJSONFromHackalist();
     }
     google.maps.event.addDomListener(window, 'load', initialize);
       
