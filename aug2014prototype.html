@@ -84,8 +84,8 @@
       
       var latLngArray = [];
       var JSONFromHackalist = grabJSONFromHackalist();
-      latLngArray = convertAddressesWithGeocoding(JSONFromHackalist);
-      document.write(latLngArray[0]);
+      var test = convertAddressesWithGeocoding(JSONFromHackalist);
+      document.write(test);
     }
     google.maps.event.addDomListener(window, 'load', initialize);
       
