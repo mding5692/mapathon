@@ -21,9 +21,42 @@
     </style>
     
     <script>
-      
+    
+    /* Global variable for the map */
     var map;
     
+    /**
+     * Pops out loading screen while loading the points on the map
+     **/ 
+    function openLoadingScreen() {
+      
+    }
+    
+    /**
+     * Creates url depending on which month is pressed
+     **/
+    function createURLWhenMonthIsSpecified() {
+      
+    }
+    
+    /**
+     * Gets the JSON data from Hackalist API
+     **/
+    function grabJSONFromHackalist() {
+      var JSONrequest = new XMLHttpRequest();
+      JSONrequest.open("GET","http://www.hackalist.org/api/1.0/2014/08.json", false)
+      
+    }
+    
+    /**
+     * Plots the point using geocoding 
+     **/
+    function plotWithGeocoding() {
+      
+    }
+    /**
+     * Creates the map; see this as the main function
+     **/
     function initialize() {
       map = new google.maps.Map(document.getElementById('map_canvas'), {
         zoom: 8,
