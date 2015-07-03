@@ -54,7 +54,7 @@
       JSONrequest.open("GET","http://www.hackalist.org/api/1.0/2014/08.json", false);
       JSONrequest.send();
       JSONresponse = JSONrequest.responseText;
-      var JSONToBeReturned = JSON.parse(JSONresponse);
+      var JSONToBeReturned = JSON.stringify(JSONresponse);
       return JSONToBeReturned;
     }
     
