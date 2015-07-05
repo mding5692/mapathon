@@ -1,18 +1,18 @@
 <!doctype html>
 <html>
   <head>
+    <meta charset="UTF-8">
     <title>Mapathon - Mapping upcoming and past hackathons by month</title>
     <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <!-- maybe implement a loading screen -->
     <!-- Add a custom UI control where you can scroll by each month and then loads out hackathons by refreshing-->
-    
-  </head>
-  <body>
-    
-    <style>
-      html, body, #map_canvas {
+        <style>
+      html, body {
         height: 100%;
+      } 
+      #map_canvas {
+        height: 500px;
         padding: 0;
         margin: 0;
       }
@@ -20,6 +20,33 @@
     </style>
     
     <script>
+
+    /*
+    Format of Hackalist API
+{
+  "August": [
+    {
+      "title": "GeauxHack",
+      "url": "http://geauxhack.com/",
+      "startDate": "August 30",
+      "endDate": "August 31",
+      "year": "2014",
+      "city": "Baton Rouge, LA, United States",
+      "host": "Louisiana State University",
+      "length": "24",
+      "size": "150+",
+      "travel": "unknown",
+      "prize": "yes",
+      "highSchoolers": "yes",
+      "facebookURL": "https://www.facebook.com/GeauxHack",
+      "twitterURL": "https://twitter.com/GeauxHack",
+      "googlePlusURL": "",
+      "notes": ""
+    }
+  ]
+}
+
+     */
     
     /*** Global variables ***/
     var map; // To reference the map
@@ -60,38 +87,72 @@
     }
     
     /**
-     * Gets the relevant information we need from Hackalist JSON
-     * Returns as JSON with relevant information
-     **/
-    
-    /**
      * Converts the Addresses into LatLng format with Geocoding
      * Takes JSON data as Input where address information is used
      * Returns an array of LatLngs
      **/
-    function convertAddressesWithGeocoding(JSONInput) {
+    function convertAddressesToLatLng(JSONInput) {
       var newlatLngArray = [];
-      var address = JSONInput.August[0].city;;
-      return address;
+      var givenAddress = JSON.stringify(JSONInput.August[0].city);
+      var geocoder = new google.maps.Geocoder();
+      var latLngAddress;
+
+      var hackathonName = JSONInput.August[0].title;
+      var hackathonHost = JSONInput.August[0].host;
+      var hackathonURL = JSONInput.August[0].url;
+      var startDate = JSONInput.August[0].startDate;
+      var endDate = JSONInput.August[0].endDate;
+      
+      geocoder.geocode( { 'address': givenAddress}, function(results, status) {
+        
+        if (status == google.maps.GeocoderStatus.OK) {
+          console.log("ok");
+          latLngAddress = results[0].geometry.location;
+          newlatLngArray.push(latLngAddress[0]);
+          newlatLngArray.push(latLngAddress[1]);
+        
+        var marker = new google.maps.Marker({
+            map: map,
+            position: latLngAddress,
+            clickable: true
+        });
+
+        marker.info = new google.maps.InfoWindow({
+          content: "<div class='infowindow'> name: " + hackathonName + "<br> host: " + hackathonHost + "<br> address: " + givenAddress + "<br> Website: <a href=" + hackathonURL + ">" + hackathonURL +"</a>" + "<br> Starting date : " + startDate + "<br> Ending date : " + endDate + "</div>"
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+          marker.info.open(map, marker);
+        });
+      };
+    });
+
+      return newlatLngArray;
     }
     /**
      * Creates the map; see this as the main function
      **/
     function initialize() {
-      map = new google.maps.Map(document.getElementById('map_canvas'), {
+      var mapOptions = {
         zoom: 4,
-        center: {lat: -34.397, lng: 150.644}
-      });
+        center: {lat: -34.397, lng: 150.644},
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      }; 
+      map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
       
       var latLngArray = [];
       var JSONFromHackalist = grabJSONFromHackalist();
-      var test = convertAddressesWithGeocoding(JSONFromHackalist);
-      //document.write(test);
+      var test = convertAddressesToLatLng(JSONFromHackalist);
+
     }
-    google.maps.event.addDomListener(window, 'load', initialize);
-      
+      google.maps.event.addDomListener(window, 'load', initialize);
     </script>
     
+
+
+  </head>
+  <body>
     
     <div id="map_canvas"></div>
   </body>
+</html>
