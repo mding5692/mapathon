@@ -12,7 +12,7 @@
         height: 100%;
       } 
       #map_canvas {
-        height: 500px;
+        height: 100%;
         padding: 0;
         margin: 0;
       }
@@ -52,7 +52,122 @@
     var map; // To reference the map
     var year; // To store the year chosen (e.g: 2014, 2015)
     var month; // To store the month chosen (e.g: Aug or 08 or 09)
+    var mapStyle; // Setting the style of the map
     
+    /** See link for map : https://snazzymaps.com/style/143/captor **/
+    mapStyle = [
+                {
+                    "featureType": "water",
+                    "stylers": [
+                        {
+                            "color": "#0e171d"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "landscape",
+                    "stylers": [
+                        {
+                            "color": "#1e303d"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "stylers": [
+                        {
+                            "color": "#1e303d"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi.park",
+                    "stylers": [
+                        {
+                            "color": "#1e303d"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit",
+                    "stylers": [
+                        {
+                            "color": "#182731"
+                        },
+                        {
+                            "visibility": "simplified"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "labels.icon",
+                    "stylers": [
+                        {
+                            "color": "#f0c514"
+                        },
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [
+                        {
+                            "color": "#1e303d"
+                        },
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#e77e24"
+                        },
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#94a5a6"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative",
+                    "elementType": "labels",
+                    "stylers": [
+                        {
+                            "visibility": "simplified"
+                        },
+                        {
+                            "color": "#e84c3c"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "stylers": [
+                        {
+                            "color": "#e84c3c"
+                        },
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                }
+            ];
     /*** Functions ***/
     
     /**
@@ -118,7 +233,7 @@
         });
 
         marker.info = new google.maps.InfoWindow({
-          content: "<div class='infowindow'> name: " + hackathonName + "<br> host: " + hackathonHost + "<br> address: " + givenAddress + "<br> Website: <a href=" + hackathonURL + ">" + hackathonURL +"</a>" + "<br> Starting date : " + startDate + "<br> Ending date : " + endDate + "</div>"
+          content: "<div class='infowindow'> <b> Name: </b> " + hackathonName + "<br> <b> Host </b>: " + hackathonHost + "<br> <b>Address: </b>" + givenAddress + "<br> <b> Website: </b><a href=" + hackathonURL + ">" + hackathonURL +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>"
         });
 
         google.maps.event.addListener(marker, 'click', function() {
@@ -133,12 +248,20 @@
      * Creates the map; see this as the main function
      **/
     function initialize() {
+
+      var styledMap = new google.maps.StyledMapType(mapStyle, {name: "captor map"});
+
       var mapOptions = {
         zoom: 4,
+        minZoom: 3,
         center: {lat: -34.397, lng: 150.644},
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+        styles: [{"featureType":"water","stylers":[{"color":"#0e171d"}]},{"featureType":"landscape","stylers":[{"color":"#1e303d"}]},{"featureType":"road","stylers":[{"color":"#1e303d"}]},{"featureType":"poi.park","stylers":[{"color":"#1e303d"}]},{"featureType":"transit","stylers":[{"color":"#182731"},{"visibility":"simplified"}]},{"featureType":"poi","elementType":"labels.icon","stylers":[{"color":"#f0c514"},{"visibility":"off"}]},{"featureType":"poi","elementType":"labels.text.stroke","stylers":[{"color":"#1e303d"},{"visibility":"off"}]},{"featureType":"transit","elementType":"labels.text.fill","stylers":[{"color":"#e77e24"},{"visibility":"off"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#94a5a6"}]},{"featureType":"administrative","elementType":"labels","stylers":[{"visibility":"simplified"},{"color":"#e84c3c"}]},{"featureType":"poi","stylers":[{"color":"#e84c3c"},{"visibility":"off"}]}],
+        disableDefaultUI: true
       }; 
       map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+
+     // map.mapTypes.set('map_style', styledMap);
+     // map.setMapTypeId('map_style');
       
       var latLngArray = [];
       var JSONFromHackalist = grabJSONFromHackalist();
