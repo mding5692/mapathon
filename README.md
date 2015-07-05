@@ -1,6 +1,6 @@
 # mapathon
 For ChallengePost "Maps As Art" online hackathon submission
-
+[![Stories in Ready](https://badge.waffle.io/mding5692/mapathon.png?label=ready&title=Ready)](http://waffle.io/mding5692/mapathon)
 
 Criteria: Reimagine the world around you and unleash your inner cartographer. Create a ‘wall worthy’ interactive map that illustrates one way in which you see the world. (Bonus points for going 3D!)
 
@@ -21,4 +21,4 @@ Considering :
   - Open Data Day Map : https://docs.google.com/spreadsheets/d/1cV43fuzwy2q2ZKDWrHVS6XR4O8B01eLevh4PD6nCENE/edit#gid=11
   <br>  (Note the above already has a map with hackathons)
 
-[![Stories in Ready](https://badge.waffle.io/mding5692/mapathon.png?label=ready&title=Ready)](http://waffle.io/mding5692/mapathon)
+
