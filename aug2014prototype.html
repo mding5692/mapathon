@@ -53,17 +53,69 @@
     var year; // To store the year chosen (e.g: 2014, 2015)
     var month; // To store the month chosen (e.g: Aug or 08 or 09)
     var mapStyle; // Setting the style of the map
-    
+    var markerIcon = "https://cloud.githubusercontent.com/assets/9067177/8510467/e281c302-22b3-11e5-8ea4-08b55c12845a.png"; // The standard icon for the marker
     
     /*** Functions ***/
     
     /**
-     * Pops out loading screen while loading the points on the map
+     * Pops out opening screen with instructions on how to use it
+     * Takes in the div to be used to store openingScreen and the map its for
      **/ 
-    function openLoadingScreen() {
+    function OpeningScreen(openScreenDiv,map) {
+      var openScreenUI = document.createElement("div");
+      openScreenUI.style.backgroundColor = '#ea6153';
+      openScreenUI.style.border = '2px solid #333';
+      openScreenUI.style.borderRadius = '10px';
+      openScreenUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+      openScreenUI.style.marginBottom = '10em';
+      openScreenUI.style.textAlign = 'center';
+      openScreenDiv.appendChild(openScreenUI);
+
+      var openingScreenText = document.createElement('div');
+      openingScreenText.style.color = '#fff';
+      openingScreenText.style.fontFamily = 'Roboto,Arial,sans-serif';
+      openingScreenText.style.fontSize = '16px';
+      openingScreenText.style.lineHeight = '38px';
+      openingScreenText.style.paddingLeft = '5px';
+      openingScreenText.style.paddingRight = '5px';
+      openingScreenText.innerHTML = " <b> Instructions : </b> Choose the year and the month and get a display of the hackathons around the world at that time, press <b> next </b> to advance to selecting year and month. ";
+      openScreenUI.appendChild(openingScreenText);
+    }
+
+    /**
+     * Loads the next button
+     * If pressed it calls the closeOpeningScreen()
+     **/
+    function loadNextButton(openScreenDiv) {
+      var nextButton = document.createElement("div");
       
     }
+
+    /**
+     * Closes opening screen when next is pressed
+     * Takes to see if next is pressed and the div and map
+     **/
+    function closeOpeningScreen(openScreenDiv, map) {
+
+    }
+
+    /**
+     * Adds the year button to the custom UI
+     * Takes a div element where button is stored and the map its to be used for
+     * Returns which year has been chosen
+     **/
+    function chooseYearButton(yearButtonDiv, map) {
+
+    }
     
+    /**
+     * Adds the month button to the custom UI
+     * Returns which month has been chosen
+     **/
+     function chooseMonthButton(monthButtonDiv, map) {
+
+     }
+
     /**
      * Creates url depending on which month is pressed
      * Returns the URL
@@ -116,6 +168,7 @@
         var marker = new google.maps.Marker({
             map: map,
             position: latLngAddress,
+            icon: markerIcon,
             clickable: true
         });
 
@@ -153,6 +206,12 @@
       var latLngArray = [];
       var JSONFromHackalist = grabJSONFromHackalist();
       var test = convertAddressesToLatLng(JSONFromHackalist);
+
+      var openingScreenDiv = document.createElement('div');
+      var openingScreen = new OpeningScreen(openingScreenDiv, map);
+
+      openingScreenDiv.index = 1;
+      map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(openingScreenDiv);
 
     }
       google.maps.event.addDomListener(window, 'load', initialize);
