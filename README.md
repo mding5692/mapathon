@@ -20,3 +20,5 @@ Considering :
   - Hackathon.io
   - Open Data Day Map : https://docs.google.com/spreadsheets/d/1cV43fuzwy2q2ZKDWrHVS6XR4O8B01eLevh4PD6nCENE/edit#gid=11
   <br>  (Note the above already has a map with hackathons)
+
+[![Stories in Ready](https://badge.waffle.io/mding5692/mapathon.png?label=ready&title=Ready)](http://waffle.io/mding5692/mapathon)
