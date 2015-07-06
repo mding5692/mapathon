@@ -1,0 +1,339 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Mapathon - Mapping upcoming and past hackathons by month</title>
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <!-- maybe implement a loading screen -->
+    <!-- Add a custom UI control where you can scroll by each month and then loads out hackathons by refreshing-->
+        <style>
+      html, body {
+        height: 100%;
+      } 
+      #map_canvas {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      
+    </style>
+    
+    <script>
+
+    /*
+    Format of Hackalist API
+{
+  "August": [
+    {
+      "title": "GeauxHack",
+      "url": "http://geauxhack.com/",
+      "startDate": "August 30",
+      "endDate": "August 31",
+      "year": "2014",
+      "city": "Baton Rouge, LA, United States",
+      "host": "Louisiana State University",
+      "length": "24",
+      "size": "150+",
+      "travel": "unknown",
+      "prize": "yes",
+      "highSchoolers": "yes",
+      "facebookURL": "https://www.facebook.com/GeauxHack",
+      "twitterURL": "https://twitter.com/GeauxHack",
+      "googlePlusURL": "",
+      "notes": ""
+    }
+  ]
+}
+
+     */
+    
+    /*** Global variables ***/
+    var map; // To reference the map
+    var year; // To store the year chosen (e.g: 2014, 2015)
+    var month; // To store the month chosen (e.g: Aug or 08 or 09)
+    var mapStyle; // Setting the style of the map
+    var markerIcon = "https://cloud.githubusercontent.com/assets/9067177/8510467/e281c302-22b3-11e5-8ea4-08b55c12845a.png"; // The standard icon for the marker
+    
+    /*** Functions ***/
+    
+    // DRY principle = next time you can just create one initialization of the screenDiv and change the innerHTML element and its positioning
+
+    /**
+     * Pops out opening screen with instructions on how to use it
+     * Takes in the div to be used to store openingScreen and the map its for
+     **/ 
+    function InstructionScreen(openScreenDiv,map) {
+      // creates a div HTML element to hold the UI
+      var openScreenUI = document.createElement("div");
+      openScreenUI.style.marginLeft = "10em";
+      openScreenUI.style.backgroundColor = '#ea6153';
+      openScreenUI.style.border = '2px solid #333';
+      openScreenUI.style.borderRadius = '10px';
+      openScreenUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+      openScreenUI.style.marginBottom = '10em';
+      openScreenUI.style.textAlign = 'center';
+      openScreenDiv.appendChild(openScreenUI);
+
+      // creates another div inside to hold text
+      var openingScreenText = document.createElement('div');
+      openingScreenText.style.color = '#fff';
+      openingScreenText.style.fontFamily = 'Roboto,Arial,sans-serif';
+      openingScreenText.style.fontSize = '16px';
+      openingScreenText.style.lineHeight = '38px';
+      openingScreenText.style.paddingLeft = '10em';
+      openingScreenText.style.paddingRight = '10em';
+      openingScreenText.innerHTML = " <b> Instructions : </b> Choose the year and the month and get a display of the hackathons around the world at that time, press <b> next </b> to advance to selecting year and month. ";
+      openScreenUI.appendChild(openingScreenText);
+
+    }
+
+    /**
+     * Loads the next button
+     * If pressed it calls the closeOpeningScreen()
+     **/
+    function NextButton(openScreenDiv, map) {
+      // creates a div HTML element to hold the UI
+      var nextButton = document.createElement("div");
+      nextButton.style.marginRight = "5em";
+      nextButton.style.cursor = 'pointer';
+      nextButton.style.backgroundColor = '#ea6153';
+      nextButton.style.border = '2px solid #333';
+      nextButton.style.borderRadius = '10px';
+      nextButton.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+      nextButton.style.marginBottom = '10em';
+      nextButton.style.textAlign = 'center';
+      openScreenDiv.appendChild(nextButton);
+
+      // creates another div inside to hold text
+      var nextButtonText = document.createElement('div');
+      nextButtonText.style.color = '#fff';
+      nextButtonText.style.fontFamily = 'Roboto,Arial,sans-serif';
+      nextButtonText.style.fontSize = '20px';
+      nextButtonText.style.lineHeight = '38px';
+      nextButtonText.style.paddingLeft = '10em';
+      nextButtonText.style.paddingRight = '10em';
+      nextButtonText.innerHTML = " <b>NEXT </b> ";
+      nextButton.appendChild(nextButtonText);
+
+      // closes the button if pressed
+      google.maps.event.addDomListener(nextButton, 'click', function() {
+        closeDiv(nextButton);
+      });
+
+    }
+
+    /**
+     * Closes opening screen when next is pressed
+     * Takes to see if next is pressed and the div and map
+     **/
+    function closeDiv(openScreenDiv) {
+      openScreenDiv.style.display = "none";
+    }
+
+    /**
+     * For fading in animation on the buttons
+     **/
+    function fadeIn(element) {
+      var op = 0.1;  // initial opacity
+      element.style.display = 'block';
+      var timer = setInterval(function () {
+        if (op >= 1){
+            clearInterval(timer);
+        }
+        element.style.opacity = op;
+        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        op += op * 0.05;
+    }, 10);
+  }
+
+    /**
+     * For fading out animation on the buttons
+     **/
+    function fadeOut(element) {
+      var op = 1;  // initial opacity
+      var timer = setInterval(function () {
+          if (op <= 0.1){
+              clearInterval(timer);
+              element.style.display = 'none';
+          }
+          element.style.opacity = op;
+          element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+          op -= op * 0.1;
+    }, 50);
+  }
+
+    /**
+     * Adds the year button to the custom UI
+     * Takes a div element where button is stored and the map its to be used for
+     * Returns which year has been chosen
+     **/
+    function SelectYear(yearButtonDiv, map) {
+      var yearSelectDiv = document.createElement("div");
+      yearSelectDiv.style.marginRight = "5em";
+      yearSelectDiv.style.cursor = 'pointer';
+      yearSelectDiv.style.backgroundColor = '#ea6153';
+      yearSelectDiv.style.border = '2px solid #333';
+      yearSelectDiv.style.borderRadius = '10px';
+      yearSelectDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+      yearSelectDiv.style.marginBottom = '10em';
+      yearSelectDiv.style.textAlign = 'center';
+      yearButtonDiv.appendChild(yearSelectDiv);
+
+      // creates another div inside to hold text
+      var yearSelect = document.createElement('select');
+      yearSelect.style.color = '#333';
+      yearSelect.style.fontFamily = 'Roboto,Arial,sans-serif';
+      yearSelect.style.fontSize = '20px';
+      yearSelect.style.lineHeight = '38px';
+      yearSelect.style.paddingLeft = '10em';
+      yearSelect.style.paddingRight = '10em';
+      yearSelect.innerHTML = "<option> </option> <option value='2014'> 2014 </option> <option value='2015'> 2015 </option> ";
+      yearSelectDiv.appendChild(yearSelect);
+    }
+    
+    /**
+     * Adds the month button to the custom UI
+     * Returns which month has been chosen
+     **/
+     function SelectMonth(monthButtonDiv, map) {
+
+     }
+
+    /**
+     * Creates url depending on which month is pressed
+     * Returns the URL
+     **/
+    function createURLWhenMonthIsSpecifiedForHackalistAPI() {
+      yearStr = year.toString();
+      monthStr = month.toString();
+      var URL = "http://www.hackalist.org/api/1.0/" + yearStr + "/" + monthStr + ".json";
+      return URL;
+    }
+    
+    /**
+     * Gets the JSON data from Hackalist API
+     * Returns as JSON
+     **/
+    function grabJSONFromHackalist() {
+      var JSONrequest = new XMLHttpRequest();
+      JSONrequest.open("GET","http://www.hackalist.org/api/1.0/2014/08.json", false);
+      JSONrequest.send();
+      JSONresponse = JSONrequest.responseText;
+      var JSONToBeReturned = JSON.parse(JSONresponse);
+      return JSONToBeReturned;
+    }
+    
+    /**
+     * Converts the Addresses into LatLng format with Geocoding
+     * Takes JSON data as Input where address information is used
+     * Returns an array of LatLngs
+     **/
+    function convertAddressesToLatLng(JSONInput) {
+      var newlatLngArray = [];
+      var givenAddress = JSON.stringify(JSONInput.August[0].city);
+      var geocoder = new google.maps.Geocoder();
+      var latLngAddress;
+
+      var hackathonName = JSONInput.August[0].title;
+      var hackathonHost = JSONInput.August[0].host;
+      var hackathonURL = JSONInput.August[0].url;
+      var startDate = JSONInput.August[0].startDate;
+      var endDate = JSONInput.August[0].endDate;
+      
+      geocoder.geocode( { 'address': givenAddress}, function(results, status) {
+        
+        if (status == google.maps.GeocoderStatus.OK) {
+          console.log("ok");
+          latLngAddress = results[0].geometry.location;
+          newlatLngArray.push(latLngAddress[0]);
+          newlatLngArray.push(latLngAddress[1]);
+        
+        var marker = new google.maps.Marker({
+            map: map,
+            position: latLngAddress,
+            icon: markerIcon,
+            clickable: true
+        });
+
+        marker.info = new google.maps.InfoWindow({
+          content: "<div class='infowindow'> <b> Name: </b> " + hackathonName + "<br> <b> Host </b>: " + hackathonHost + "<br> <b>Address: </b>" + givenAddress + "<br> <b> Website: </b><a href=" + hackathonURL + ">" + hackathonURL +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>"
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+          marker.info.open(map, marker);
+        });
+      };
+    });
+
+      return newlatLngArray;
+    }
+    /**
+     * Creates the map; see this as the main function
+     **/
+    function initialize() {
+
+      var styledMap = new google.maps.StyledMapType(mapStyle, {name: "captor map"});
+
+      var mapOptions = {
+        zoom: 4,
+        minZoom: 3,
+        center: {lat: -34.397, lng: 150.644},
+        styles: [{"featureType":"water","stylers":[{"color":"#0e171d"}]},{"featureType":"landscape","stylers":[{"color":"#1e303d"}]},{"featureType":"road","stylers":[{"color":"#1e303d"}]},{"featureType":"poi.park","stylers":[{"color":"#1e303d"}]},{"featureType":"transit","stylers":[{"color":"#182731"},{"visibility":"simplified"}]},{"featureType":"poi","elementType":"labels.icon","stylers":[{"color":"#f0c514"},{"visibility":"off"}]},{"featureType":"poi","elementType":"labels.text.stroke","stylers":[{"color":"#1e303d"},{"visibility":"off"}]},{"featureType":"transit","elementType":"labels.text.fill","stylers":[{"color":"#e77e24"},{"visibility":"off"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#94a5a6"}]},{"featureType":"administrative","elementType":"labels","stylers":[{"visibility":"simplified"},{"color":"#e84c3c"}]},{"featureType":"poi","stylers":[{"color":"#e84c3c"},{"visibility":"off"}]}],
+        disableDefaultUI: true
+      }; 
+      map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+      
+      // grabs data from Hackalist API
+      var latLngArray = [];
+      var JSONFromHackalist = grabJSONFromHackalist();
+      var test = convertAddressesToLatLng(JSONFromHackalist);
+
+      // creates the instructions
+      var instructionScreenDiv = document.createElement('div');
+      var instructionScreen = new InstructionScreen(instructionScreenDiv, map);
+
+      instructionScreenDiv.index = 1;
+      map.controls[google.maps.ControlPosition.LEFT_CENTER].push(instructionScreenDiv);
+
+      // creates the next Button
+      var nextButtonDiv = document.createElement('div');
+      var nextButton = new NextButton(nextButtonDiv, map);
+
+      nextButtonDiv.index = 1;
+      nextButtonDiv.style.display = "none";
+      map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(nextButtonDiv);
+      // times it for 3 seconds before next Button appears
+      var count = 0;
+      setInterval(function(){ 
+        count++;
+        if (count == 3) {
+          fadeIn(nextButtonDiv);
+        }
+      }, 1000);
+
+      var yearSelectDiv = document.createElement('div');
+      var selectYear = new SelectYear(yearSelectDiv, map);
+
+      yearSelectDiv.index = 1;
+      map.controls[google.maps.ControlPosition.TOP_LEFT].push(yearSelectDiv);
+      yearSelectDiv.style.display ="none";
+
+      // closes the instructions after next is pressed and loads selections
+      google.maps.event.addDomListener(nextButtonDiv, 'click', function() {
+        fadeOut(instructionScreenDiv);
+        fadeIn(yearSelectDiv);
+      });
+
+    }
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+    
+
+
+  </head>
+  <body>
+    
+    <div id="map_canvas"></div>
+  </body>
+</html>
