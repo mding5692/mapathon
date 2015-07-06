@@ -57,12 +57,16 @@
     
     /*** Functions ***/
     
+    // DRY principle = next time you can just create one initialization of the screenDiv and change the innerHTML element and its positioning
+
     /**
      * Pops out opening screen with instructions on how to use it
      * Takes in the div to be used to store openingScreen and the map its for
      **/ 
-    function OpeningScreen(openScreenDiv,map) {
+    function InstructionScreen(openScreenDiv,map) {
+      // creates a div HTML element to hold the UI
       var openScreenUI = document.createElement("div");
+      openScreenUI.style.marginLeft = "10em";
       openScreenUI.style.backgroundColor = '#ea6153';
       openScreenUI.style.border = '2px solid #333';
       openScreenUI.style.borderRadius = '10px';
@@ -71,48 +75,128 @@
       openScreenUI.style.textAlign = 'center';
       openScreenDiv.appendChild(openScreenUI);
 
+      // creates another div inside to hold text
       var openingScreenText = document.createElement('div');
       openingScreenText.style.color = '#fff';
       openingScreenText.style.fontFamily = 'Roboto,Arial,sans-serif';
       openingScreenText.style.fontSize = '16px';
       openingScreenText.style.lineHeight = '38px';
-      openingScreenText.style.paddingLeft = '5px';
-      openingScreenText.style.paddingRight = '5px';
+      openingScreenText.style.paddingLeft = '10em';
+      openingScreenText.style.paddingRight = '10em';
       openingScreenText.innerHTML = " <b> Instructions : </b> Choose the year and the month and get a display of the hackathons around the world at that time, press <b> next </b> to advance to selecting year and month. ";
       openScreenUI.appendChild(openingScreenText);
+
     }
 
     /**
      * Loads the next button
      * If pressed it calls the closeOpeningScreen()
      **/
-    function loadNextButton(openScreenDiv) {
+    function NextButton(openScreenDiv, map) {
+      // creates a div HTML element to hold the UI
       var nextButton = document.createElement("div");
-      
+      nextButton.style.marginRight = "5em";
+      nextButton.style.cursor = 'pointer';
+      nextButton.style.backgroundColor = '#ea6153';
+      nextButton.style.border = '2px solid #333';
+      nextButton.style.borderRadius = '10px';
+      nextButton.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+      nextButton.style.marginBottom = '10em';
+      nextButton.style.textAlign = 'center';
+      openScreenDiv.appendChild(nextButton);
+
+      // creates another div inside to hold text
+      var nextButtonText = document.createElement('div');
+      nextButtonText.style.color = '#fff';
+      nextButtonText.style.fontFamily = 'Roboto,Arial,sans-serif';
+      nextButtonText.style.fontSize = '20px';
+      nextButtonText.style.lineHeight = '38px';
+      nextButtonText.style.paddingLeft = '10em';
+      nextButtonText.style.paddingRight = '10em';
+      nextButtonText.innerHTML = " <b>NEXT </b> ";
+      nextButton.appendChild(nextButtonText);
+
+      // closes the button if pressed
+      google.maps.event.addDomListener(nextButton, 'click', function() {
+        closeDiv(nextButton);
+      });
+
     }
 
     /**
      * Closes opening screen when next is pressed
      * Takes to see if next is pressed and the div and map
      **/
-    function closeOpeningScreen(openScreenDiv, map) {
-
+    function closeDiv(openScreenDiv) {
+      openScreenDiv.style.display = "none";
     }
+
+    /**
+     * For fading in animation on the buttons
+     **/
+    function fadeIn(element) {
+      var op = 0.1;  // initial opacity
+      element.style.display = 'block';
+      var timer = setInterval(function () {
+        if (op >= 1){
+            clearInterval(timer);
+        }
+        element.style.opacity = op;
+        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        op += op * 0.05;
+    }, 10);
+  }
+
+    /**
+     * For fading out animation on the buttons
+     **/
+    function fadeOut(element) {
+      var op = 1;  // initial opacity
+      var timer = setInterval(function () {
+          if (op <= 0.1){
+              clearInterval(timer);
+              element.style.display = 'none';
+          }
+          element.style.opacity = op;
+          element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+          op -= op * 0.1;
+    }, 50);
+  }
 
     /**
      * Adds the year button to the custom UI
      * Takes a div element where button is stored and the map its to be used for
      * Returns which year has been chosen
      **/
-    function chooseYearButton(yearButtonDiv, map) {
+    function SelectYear(yearButtonDiv, map) {
+      var yearSelectDiv = document.createElement("div");
+      yearSelectDiv.style.marginRight = "5em";
+      yearSelectDiv.style.cursor = 'pointer';
+      yearSelectDiv.style.backgroundColor = '#ea6153';
+      yearSelectDiv.style.border = '2px solid #333';
+      yearSelectDiv.style.borderRadius = '10px';
+      yearSelectDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+      yearSelectDiv.style.marginBottom = '10em';
+      yearSelectDiv.style.textAlign = 'center';
+      yearButtonDiv.appendChild(yearSelectDiv);
 
+      // creates another div inside to hold text
+      var yearSelect = document.createElement('select');
+      yearSelect.style.color = '#333';
+      yearSelect.style.fontFamily = 'Roboto,Arial,sans-serif';
+      yearSelect.style.fontSize = '20px';
+      yearSelect.style.lineHeight = '38px';
+      yearSelect.style.paddingLeft = '10em';
+      yearSelect.style.paddingRight = '10em';
+      yearSelect.innerHTML = "<option> </option> <option value='2014'> 2014 </option> <option value='2015'> 2015 </option> ";
+      yearSelectDiv.appendChild(yearSelect);
     }
     
     /**
      * Adds the month button to the custom UI
      * Returns which month has been chosen
      **/
-     function chooseMonthButton(monthButtonDiv, map) {
+     function SelectMonth(monthButtonDiv, map) {
 
      }
 
@@ -199,19 +283,47 @@
         disableDefaultUI: true
       }; 
       map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-
-     // map.mapTypes.set('map_style', styledMap);
-     // map.setMapTypeId('map_style');
       
+      // grabs data from Hackalist API
       var latLngArray = [];
       var JSONFromHackalist = grabJSONFromHackalist();
       var test = convertAddressesToLatLng(JSONFromHackalist);
 
-      var openingScreenDiv = document.createElement('div');
-      var openingScreen = new OpeningScreen(openingScreenDiv, map);
+      // creates the instructions
+      var instructionScreenDiv = document.createElement('div');
+      var instructionScreen = new InstructionScreen(instructionScreenDiv, map);
 
-      openingScreenDiv.index = 1;
-      map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(openingScreenDiv);
+      instructionScreenDiv.index = 1;
+      map.controls[google.maps.ControlPosition.LEFT_CENTER].push(instructionScreenDiv);
+
+      // creates the next Button
+      var nextButtonDiv = document.createElement('div');
+      var nextButton = new NextButton(nextButtonDiv, map);
+
+      nextButtonDiv.index = 1;
+      nextButtonDiv.style.display = "none";
+      map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(nextButtonDiv);
+      // times it for 3 seconds before next Button appears
+      var count = 0;
+      setInterval(function(){ 
+        count++;
+        if (count == 3) {
+          fadeIn(nextButtonDiv);
+        }
+      }, 1000);
+
+      var yearSelectDiv = document.createElement('div');
+      var selectYear = new SelectYear(yearSelectDiv, map);
+
+      yearSelectDiv.index = 1;
+      map.controls[google.maps.ControlPosition.TOP_LEFT].push(yearSelectDiv);
+      yearSelectDiv.style.display ="none";
+
+      // closes the instructions after next is pressed and loads selections
+      google.maps.event.addDomListener(nextButtonDiv, 'click', function() {
+        fadeOut(instructionScreenDiv);
+        fadeIn(yearSelectDiv);
+      });
 
     }
       google.maps.event.addDomListener(window, 'load', initialize);
