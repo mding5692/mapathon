@@ -182,14 +182,17 @@
 
       // creates another div inside to hold text
       var yearSelect = document.createElement('select');
+      yearSelect.id = "yearIsSelected";
       yearSelect.style.color = '#333';
       yearSelect.style.fontFamily = 'Roboto,Arial,sans-serif';
       yearSelect.style.fontSize = '20px';
       yearSelect.style.lineHeight = '38px';
       yearSelect.style.paddingLeft = '10em';
       yearSelect.style.paddingRight = '10em';
-      yearSelect.innerHTML = "<option> </option> <option value='2014'> 2014 </option> <option value='2015'> 2015 </option> ";
+      yearSelect.innerHTML = "<option value='0'> </option> <option value='2014'> 2014 </option> <option value='2015'> 2015 </option>";
       yearSelectDiv.appendChild(yearSelect);
+
+
     }
     
     /**
@@ -197,14 +200,36 @@
      * Returns which month has been chosen
      **/
      function SelectMonth(monthButtonDiv, map) {
+      var monthDiv = document.createElement("div");
+      monthDiv.style.marginRight = "5em";
+      monthDiv.style.cursor = 'pointer';
+      monthDiv.style.backgroundColor = '#ea6153';
+      monthDiv.style.border = '2px solid #333';
+      monthDiv.style.borderRadius = '10px';
+      monthDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+      monthDiv.style.marginBottom = '10em';
+      monthDiv.style.textAlign = 'center';
+      monthButtonDiv.appendChild(monthDiv);
 
+      // creates another div inside to hold text
+      var monthSelect = document.createElement('select');
+      monthSelect.id = "monthIsSelected";
+      monthSelect.style.color = '#333';
+      monthSelect.style.fontFamily = 'Roboto,Arial,sans-serif';
+      monthSelect.style.fontSize = '20px';
+      monthSelect.style.lineHeight = '38px';
+      monthSelect.style.paddingLeft = '10em';
+      monthSelect.style.paddingRight = '10em';
+      monthSelect.innerHTML = "<option value='0'> </option> <option value='2014'> 2014 </option> <option value='2015'> 2015 </option>";
+      monthDiv.appendChild(monthSelect);
      }
 
     /**
      * Creates url depending on which month is pressed
+     * Takes in the year and month specified
      * Returns the URL
      **/
-    function createURLWhenMonthIsSpecifiedForHackalistAPI() {
+    function createURLWhenMonthIsSpecifiedForHackalistAPI(year,month) {
       yearStr = year.toString();
       monthStr = month.toString();
       var URL = "http://www.hackalist.org/api/1.0/" + yearStr + "/" + monthStr + ".json";
@@ -324,6 +349,23 @@
         fadeOut(instructionScreenDiv);
         fadeIn(yearSelectDiv);
       });
+
+      // gets the year after user selects it
+      var yearIsSelected = document.getElementById('yearIsSelected');
+
+      if (yearIsSelected) {
+      var chosenYear = yearIsSelected.options[yearIsSelected.selectedIndex].value;
+
+        if (chosenYear !== 0) {
+          var monthSelectDiv = document.createElement('div');
+          var selectMonth = new SelectMonth(monthSelectDiv, map);
+
+          monthSelectDiv.index = 0;
+          map.controls[google.maps.ControlPosition.TOP_RIGHT].push(monthSelectDiv);
+          fadeIn(monthSelectDiv);
+        }
+      }
+
 
     }
       google.maps.event.addDomListener(window, 'load', initialize);
