@@ -105,7 +105,7 @@
       openingScreenText.style.lineHeight = '38px';
       openingScreenText.style.paddingLeft = '10em';
       openingScreenText.style.paddingRight = '10em';
-      openingScreenText.innerHTML = " <b> Instructions : </b> Choose the year and the month and get a display of the hackathons around the world at that time, press <b> next </b> to advance to selecting year and month. ";
+      openingScreenText.innerHTML = " <b> Instructions : </b> Choose the year and the month and get a display of the hackathons around the world at that time, press <b> next </b> to close the instructions ";
       openScreenUI.appendChild(openingScreenText);
 
     }
@@ -138,10 +138,6 @@
       nextButtonText.innerHTML = " <b>NEXT </b> ";
       nextButton.appendChild(nextButtonText);
 
-      // closes the button if pressed
-      google.maps.event.addDomListener(nextButton, 'click', function() {
-        closeDiv(nextButton);
-      });
 
     }
 
@@ -305,8 +301,8 @@
       // creates the next Button
       var nextButtonDiv = document.createElement('div');
       var nextButton = new NextButton(nextButtonDiv, map);
-      nextButtonDiv.index = 1;
       nextButtonDiv.style.display = "none";
+      nextButtonDiv.index = 1;
       map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(nextButtonDiv);
 
       // times it for 3 seconds before next Button appears
@@ -321,6 +317,8 @@
       // closes the instructions after next is pressed and loads selections
       google.maps.event.addDomListener(nextButtonDiv, 'click', function() {
         fadeOut(instructionScreenDiv);
+        fadeOut(nextButtonDiv);
+
       });
 
     }
@@ -334,12 +332,12 @@
     
     <div id="map_canvas"></div>
     <select id="yearSelect">
-      <option value='0'> </option> 
+      <option value="" disabled selected>Year</option>
       <option value='2014'> 2014 </option> 
       <option value='2015'> 2015 </option>
     </select>
     <select id="monthSelect">
-
+      <option value="" disabled selected>Month</option>
     </select> 
   </body>
 </html>
