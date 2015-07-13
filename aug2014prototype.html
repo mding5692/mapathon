@@ -4,44 +4,10 @@
     <meta charset="UTF-8">
     <title>Mapathon - Mapping upcoming and past hackathons by month</title>
     <!-- Google Maps API -->
+  
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
-    <!-- maybe implement a loading screen -->
-    <!-- Add a custom UI control where you can scroll by each month and then loads out hackathons by refreshing-->
-        <style>
-      html, body {
-        background: #333;
-        height: 100%;
-        font-family: 'Roboto,Arial,sans-serif';
-        font-size: '20px';
-        line-height: '30px';
-      } 
-      #map_canvas {
-        height: 93%;
-        padding: 0;
-        margin: 0;
-      }
-      select {
-        padding:3px;
-        width: 10em;
-        margin: .5em;
-        -webkit-border-radius:4px;
-        -moz-border-radius:4px;
-        border-radius:4px;
-        -webkit-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
-        -moz-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
-        box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
-        background: #f8f8f8;
-        color:#888;
-        border:none;
-        outline:none;
-        display: inline-block;
-        -webkit-appearance:none;
-        -moz-appearance:none;
-        appearance:none;
-        cursor:pointer;
-      }
-    </style>
-    
+      <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <link href="./style.css" rel="stylesheet">    
     <script>
 
     /*
@@ -73,14 +39,11 @@
     
     /*** Global variables ***/
     var map; // To reference the map
-    var year; // To store the year chosen (e.g: 2014, 2015)
-    var month; // To store the month chosen (e.g: Aug or 08 or 09)
-    var mapStyle; // Setting the style of the map
     var markerIcon = "https://cloud.githubusercontent.com/assets/9067177/8510467/e281c302-22b3-11e5-8ea4-08b55c12845a.png"; // The standard icon for the marker
-    
+   
     /*** Functions ***/
     
-    // DRY principle = next time you can just create one initialization of the screenDiv and change the innerHTML element and its positioning
+                    /******* UI and Animation functions *******/
 
     /**
      * Pops out opening screen with instructions on how to use it
@@ -89,7 +52,6 @@
     function InstructionScreen(openScreenDiv,map) {
       // creates a div HTML element to hold the UI
       var openScreenUI = document.createElement("div");
-      openScreenUI.style.marginLeft = "10em";
       openScreenUI.style.backgroundColor = '#ea6153';
       openScreenUI.style.border = '2px solid #333';
       openScreenUI.style.borderRadius = '10px';
@@ -117,7 +79,6 @@
     function NextButton(openScreenDiv, map) {
       // creates a div HTML element to hold the UI
       var nextButton = document.createElement("div");
-      nextButton.style.marginRight = "5em";
       nextButton.style.cursor = 'pointer';
       nextButton.style.backgroundColor = '#ea6153';
       nextButton.style.border = '2px solid #333';
@@ -137,18 +98,8 @@
       nextButtonText.style.paddingRight = '10em';
       nextButtonText.innerHTML = " <b>NEXT </b> ";
       nextButton.appendChild(nextButtonText);
-
-
     }
-
-    /**
-     * Closes opening screen when next is pressed
-     * Takes to see if next is pressed and the div and map
-     **/
-    function closeDiv(openScreenDiv) {
-      openScreenDiv.style.display = "none";
-    }
-
+        
     /**
      * For fading in animation on the buttons
      **/
@@ -180,42 +131,50 @@
           op -= op * 0.1;
     }, 50);
   }
+                        
+                    /****** Data and Map functions ******/
 
     /**
-     * Adds the month button to the custom UI
-     * Returns which month has been chosen
+     * Returns the year chosen by user with the select html element 
      **/
-     function SelectMonth(monthButtonDiv, map) {
-      var monthDiv = document.createElement("div");
-      monthDiv.style.marginRight = "5em";
-      monthDiv.style.cursor = 'pointer';
-      monthDiv.style.backgroundColor = '#ea6153';
-      monthDiv.style.border = '2px solid #333';
-      monthDiv.style.borderRadius = '10px';
-      monthDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
-      monthDiv.style.marginBottom = '10em';
-      monthDiv.style.textAlign = 'center';
-      monthButtonDiv.appendChild(monthDiv);
-
-      // creates another div inside to hold text
-      var monthSelect = document.createElement('select');
-      monthSelect.id = "monthIsSelected";
-      monthSelect.style.color = '#333';
-      monthSelect.style.fontFamily = 'Roboto,Arial,sans-serif';
-      monthSelect.style.fontSize = '20px';
-      monthSelect.style.lineHeight = '38px';
-      monthSelect.style.paddingLeft = '10em';
-      monthSelect.style.paddingRight = '10em';
-      monthSelect.innerHTML = "<option value='0'> </option>";
-      monthDiv.appendChild(monthSelect);
-     }
+    function getYear() {
+        var yearSelect = document.getElementById('yearSelect');
+        var chosenYear = yearSelect.options[yearSelect.selectedIndex].value;      
+        return chosenYear;
+    }
+        
+    /**
+     * Returns the year chosen by user with the select html element 
+     **/
+    function getMonth() {
+        var monthSelect = document.getElementById('monthSelect');
+        var chosenMonth = monthSelect.options[monthSelect.selectedIndex].value;      
+        return chosenMonth;
+    }
+        
+    /**
+     * Gets the year and month chosen and outputs marker on the map
+     * Creates an error if there is no year or month
+     **/
+    function getMarkerFromChosenTime() {
+        var url = "";
+        var chosenYear = getYear();
+        var chosenMonth = getMonth();
+        if (chosenYear && chosenMonth) {
+             url = createURLWhenTimeIsSpecifiedForHackalistAPI(chosenYear,chosenMonth);
+             var JSONAboutHackathon = grabJSONFromHackalist(url);
+             convertAddressesToMarker(JSONAboutHackathon);
+        } else {
+            alert("Year and Month hasn't been selected properly, try again!");
+        }
+    }
 
     /**
      * Creates url depending on which month is pressed
      * Takes in the year and month specified
      * Returns the URL
      **/
-    function createURLWhenMonthIsSpecifiedForHackalistAPI(year,month) {
+    function createURLWhenTimeIsSpecifiedForHackalistAPI(year,month) {
       yearStr = year.toString();
       monthStr = month.toString();
       var URL = "http://www.hackalist.org/api/1.0/" + yearStr + "/" + monthStr + ".json";
@@ -226,9 +185,9 @@
      * Gets the JSON data from Hackalist API
      * Returns as JSON
      **/
-    function grabJSONFromHackalist() {
+    function grabJSONFromHackalist(hackalistURL) {
       var JSONrequest = new XMLHttpRequest();
-      JSONrequest.open("GET","http://www.hackalist.org/api/1.0/2014/08.json", false);
+      JSONrequest.open("GET", hackalistURL, false);
       JSONrequest.send();
       JSONresponse = JSONrequest.responseText;
       var JSONToBeReturned = JSON.parse(JSONresponse);
@@ -238,9 +197,9 @@
     /**
      * Converts the Addresses into LatLng format with Geocoding
      * Takes JSON data as Input where address information is used
-     * Returns an array of LatLngs
+     * Puts a marker onto the map with the details of the hackathon
      **/
-    function convertAddressesToLatLng(JSONInput) {
+    function convertAddressesToMarker(JSONInput) {
       var newlatLngArray = [];
       var givenAddress = JSON.stringify(JSONInput.August[0].city);
       var geocoder = new google.maps.Geocoder();
@@ -278,7 +237,7 @@
      * Creates the map; see this as the main function
      **/
     function initialize() {
-
+     // below is configurable content for the map
       var mapOptions = {
         zoom: 4,
         minZoom: 3,
@@ -288,9 +247,7 @@
       }; 
       map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
       
-      // grabs data from Hackalist API
-      var JSONFromHackalist = grabJSONFromHackalist();
-      var test = convertAddressesToLatLng(JSONFromHackalist);
+      /** Sets up the UI and instructions **/
 
       // creates the instructions for user to read
       var instructionScreenDiv = document.createElement('div');
@@ -319,8 +276,7 @@
         fadeOut(instructionScreenDiv);
         fadeOut(nextButtonDiv);
 
-      });
-
+      });  
     }
       google.maps.event.addDomListener(window, 'load', initialize);
     </script>
@@ -331,13 +287,28 @@
   <body>
     
     <div id="map_canvas"></div>
-    <select id="yearSelect">
-      <option value="" disabled selected>Year</option>
-      <option value='2014'> 2014 </option> 
-      <option value='2015'> 2015 </option>
-    </select>
-    <select id="monthSelect">
-      <option value="" disabled selected>Month</option>
-    </select> 
-  </body>
+    <div class="container">  
+        <select id="yearSelect">
+          <option value="" disabled selected>Year</option>
+          <option value='2014'> 2014 </option> 
+          <option value='2015'> 2015 </option>
+        </select>
+        <a href="#chosenTime" onclick="getMarkerFromChosenTime()" class="action-button shadow animate blue">Lets Go!</a> 
+        <select id="monthSelect">
+          <option value="" disabled selected>Month</option>
+          <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
+    </div>
+ </body>
 </html>
