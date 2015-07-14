@@ -153,6 +153,28 @@
     }
         
     /**
+     * Take a month in integer format and converts it to string
+     **/
+    function convertIntToMonth(monthToConvert) {
+        var monthAsInt = parseInt(monthToConvert) - 1;
+        var month = new Array();
+        month[0] = "January";
+        month[1] = "February";
+        month[2] = "March";
+        month[3] = "April";
+        month[4] = "May";
+        month[5] = "June";
+        month[6] = "July";
+        month[7] = "August";
+        month[8] = "September";
+        month[9] = "October";
+        month[10] = "November";
+        month[11] = "December";
+        var convertedMonth = month[monthAsInt];
+        return convertedMonth;
+    }
+        
+    /**
      * Gets the year and month chosen and outputs marker on the map
      * Creates an error if there is no year or month
      **/
@@ -163,7 +185,7 @@
         if (chosenYear && chosenMonth) {
              url = createURLWhenTimeIsSpecifiedForHackalistAPI(chosenYear,chosenMonth);
              var JSONAboutHackathon = grabJSONFromHackalist(url);
-             convertAddressesToMarker(JSONAboutHackathon);
+             convertAddressesToMarker(JSONAboutHackathon, chosenMonth);
         } else {
             alert("Year and Month hasn't been selected properly, try again!");
         }
@@ -197,19 +219,20 @@
     /**
      * Converts the Addresses into LatLng format with Geocoding
      * Takes JSON data as Input where address information is used
+     * Also confirms the month
      * Puts a marker onto the map with the details of the hackathon
      **/
-    function convertAddressesToMarker(JSONInput) {
-      var newlatLngArray = [];
-      var givenAddress = JSON.stringify(JSONInput.August[0].city);
+    function convertAddressesToMarker(JSONInput,month) {
+      var givenMonth = convertIntToMonth(month);  
+      var givenAddress = JSON.stringify(JSONInput.givenMonth.city);
       var geocoder = new google.maps.Geocoder();
       var latLngAddress;
       // grabs the data from Hackalist API and assigns them to variables
-      var hackathonName = JSONInput.August[0].title;
-      var hackathonHost = JSONInput.August[0].host;
-      var hackathonURL = JSONInput.August[0].url;
-      var startDate = JSONInput.August[0].startDate;
-      var endDate = JSONInput.August[0].endDate;
+      var hackathonName = JSONInput.givenMonth.title;
+      var hackathonHost = JSONInput.givenMonth.host;
+      var hackathonURL = JSONInput.givenMonth.url;
+      var startDate = JSONInput.givenMonth.startDate;
+      var endDate = JSONInput.givenMonth.endDate;
       
       geocoder.geocode( { 'address': givenAddress}, function(results, status) {
         
@@ -293,7 +316,7 @@
           <option value='2014'> 2014 </option> 
           <option value='2015'> 2015 </option>
         </select>
-        <a href="#chosenTime" onclick="getMarkerFromChosenTime()" class="action-button shadow animate blue">Lets Go!</a> 
+        <a href="#" onclick="getMarkerFromChosenTime()" class="action-button shadow animate blue">Lets Go!</a> 
         <select id="monthSelect">
           <option value="" disabled selected>Month</option>
           <option value="01">January</option>
