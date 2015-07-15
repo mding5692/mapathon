@@ -9,33 +9,6 @@
       <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
     <link href="./css/style.css" rel="stylesheet">    
     <script>
-
-    /*
-    Format of Hackalist API
-{
-  "August": [
-    {
-      "title": "GeauxHack",
-      "url": "http://geauxhack.com/",
-      "startDate": "August 30",
-      "endDate": "August 31",
-      "year": "2014",
-      "city": "Baton Rouge, LA, United States",
-      "host": "Louisiana State University",
-      "length": "24",
-      "size": "150+",
-      "travel": "unknown",
-      "prize": "yes",
-      "highSchoolers": "yes",
-      "facebookURL": "https://www.facebook.com/GeauxHack",
-      "twitterURL": "https://twitter.com/GeauxHack",
-      "googlePlusURL": "",
-      "notes": ""
-    }
-  ]
-}
-
-     */
     
     /*** Global variables ***/
     var map; // To reference the map
@@ -268,7 +241,7 @@
         zoom: 4,
         minZoom: 3,
         center: {lat: -34.397, lng: 150.644},
-        styles: [{"featureType":"water","stylers":[{"color":"#0e171d"}]},{"featureType":"landscape","stylers":[{"color":"#1e303d"}]},{"featureType":"road","stylers":[{"color":"#1e303d"}]},{"featureType":"poi.park","stylers":[{"color":"#1e303d"}]},{"featureType":"transit","stylers":[{"color":"#182731"},{"visibility":"simplified"}]},{"featureType":"poi","elementType":"labels.icon","stylers":[{"color":"#f0c514"},{"visibility":"off"}]},{"featureType":"poi","elementType":"labels.text.stroke","stylers":[{"color":"#1e303d"},{"visibility":"off"}]},{"featureType":"transit","elementType":"labels.text.fill","stylers":[{"color":"#e77e24"},{"visibility":"off"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#94a5a6"}]},{"featureType":"administrative","elementType":"labels","stylers":[{"visibility":"simplified"},{"color":"#e84c3c"}]},{"featureType":"poi","stylers":[{"color":"#e84c3c"},{"visibility":"off"}]}],
+        styles: [{"featureType":"all","elementType":"all","stylers":[{"invert_lightness":true},{"saturation":10},{"lightness":30},{"gamma":0.5},{"hue":"#435158"}]}],
         disableDefaultUI: true
       }; 
       map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
