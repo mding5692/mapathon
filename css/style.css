@@ -19,7 +19,7 @@ html, body {
         margin-top: .5em;
         margin-left: auto;
         margin-right: auto;
-        width: 27%;
+        width: 28%;
       }
       select {
         padding:3px;
@@ -59,4 +59,7 @@ html, body {
         font-size: 15px;
         color: #FFF;
         text-decoration: none;	
+      }
+      #monthSelect {
+        margin-left: .7em;
       }
