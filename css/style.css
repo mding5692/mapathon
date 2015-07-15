@@ -63,3 +63,9 @@ html, body {
       #monthSelect {
         margin-left: .7em;
       }
+      .action-button:active
+      {
+      	transform: translate(0px,5px);
+        -webkit-transform: translate(0px,5px);
+      	border-bottom: 1px solid;
+      }
