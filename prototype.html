@@ -12,6 +12,9 @@
     
     /*** Global variables ***/
     var map; // To reference the map
+    var markers = new Array(); // to refer to the array of markers
+    var infowindows = new Array(); // to refer to the infowindows attached to the markers
+    var openInfoWindows = new Array(); // to refer to the infowindows that are open right now
     var markerIcon = "https://cloud.githubusercontent.com/assets/9067177/8510467/e281c302-22b3-11e5-8ea4-08b55c12845a.png"; // The standard icon for the marker
    
     /*** Functions ***/
@@ -196,6 +199,7 @@
      * Puts a marker onto the map with the details of the hackathon
      **/
     function convertAddressesToMarker(JSONInput,month) {
+      clearAllMarkersAndInfo();
       var givenMonth = convertIntToMonth(month);
       var numOfHackathonsInThatMonth = JSONInput[givenMonth].length;
         for (var i = 0; i < numOfHackathonsInThatMonth; i++) {
@@ -203,9 +207,10 @@
           var geocoder = new google.maps.Geocoder();
           var latLngAddress;
           // grabs the data from Hackalist API and assigns them to variables
+          var cityName = JSONInput[givenMonth][i].city;
           var hackathonName = JSONInput[givenMonth][i].title;
           var hackathonHost = JSONInput[givenMonth][i].host;
-          var hackathonURL = JSONInput[givenMonth][i].url;
+          var hackathonUrl = JSONInput[givenMonth][i].url;
           var startDate = JSONInput[givenMonth][i].startDate;
           var endDate = JSONInput[givenMonth][i].endDate;
 
@@ -213,10 +218,6 @@
 
             if (status == google.maps.GeocoderStatus.OK) {
               latLngAddress = results[0].geometry.location;
-              // infowindow is created and attached to the marker
-              var markerInfo = new google.maps.InfoWindow({
-                content: "<div class='infowindow'> <b> Name: </b> " + hackathonName + "<br> <b> Host </b>: " + hackathonHost + "<br> <b>Address: </b>" + givenAddress + "<br> <b> Website: </b><a href=" + hackathonURL + ">" + hackathonURL +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>"
-              }); 
               // creates a new marker with the address gained by geocoding
               var marker = new google.maps.Marker({
                   map: map,
@@ -225,16 +226,65 @@
                   clickable: true
               });
 
+              marker.set("city", cityName);
+              marker.set("eventName", hackathonName);
+              marker.set("host",hackathonHost);
+              marker.set("url", hackathonUrl);
+              marker.set("start", startDate);
+              marker.set("end", endDate);
+              
+			  google.maps.event.addListener(marker, 'click', attachInfoWindow(marker)); 
+              markers.push(marker);
+
+            } else if (status == google.maps.GeocoderStatus.ZERO_RESULTS){
+            	console.log("There was an error geocoding this address");
             }
           });
         }
     }
 
     /**
-     * Clear previously selected markers and infowindows
+     * Attaches the infowindow to the marker
+     * Takes the marker
+	 **/
+	 function attachInfoWindow(marker) {
+	 	return function(event) {
+	 		var city = marker.get("city");
+	 		var eventName = marker.get("eventName");
+	 		var host = marker.get("host");
+	 		var url = marker.get("url");
+	 		var startDate = marker.get("start");
+	 		var endDate = marker.get("end");
+	 		var contentString = "<div class='infowindow'> <b> Name: </b> " + eventName + "<br> <b> Host </b>: " + host + "<br> <b>Address: </b>" + city + "<br> <b> Website: </b><a href=" + url + ">" + url +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>";
+	 		var markerInfo = new google.maps.InfoWindow({disableAutoPan: true});
+	 		markerInfo.setContent(contentString);
+	 		markerInfo.setPosition(event.latLng);
+	 		markerInfo.open(map);
+	 		infowindows.push(markerInfo);
+	 		openInfoWindows.push(markerInfo);
+	 		// closes previous infowindow if there is another
+			if (openInfoWindows.length > 1) {
+				openInfoWindows[0].close();
+				openInfoWindows[0] = openInfoWindows[1];
+				openInfoWindows.pop();
+			}
+			// if click elsewhere on the map, infowindow closes
+			google.maps.event.addListener(map, 'click', function() {
+				markerInfo.close();
+			});
+	 	}; 	     
+	 }
+    /**
+     * Clear previously selected markers and infowindows if there are any
      **/
     function clearAllMarkersAndInfo() {
-
+    	for (var j = 0; j < markers.length; j++) {
+			markers[j].setMap(null);
+			if (infowindows[j]) {
+				infowindows[j].close();
+				infowindows.pop();
+			}
+		}
     }
 
 
