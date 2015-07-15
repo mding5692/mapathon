@@ -223,38 +223,41 @@
      * Puts a marker onto the map with the details of the hackathon
      **/
     function convertAddressesToMarker(JSONInput,month) {
-      var givenMonth = convertIntToMonth(month);  
-      var givenAddress = JSON.stringify(JSONInput.givenMonth.city);
-      var geocoder = new google.maps.Geocoder();
-      var latLngAddress;
-      // grabs the data from Hackalist API and assigns them to variables
-      var hackathonName = JSONInput.givenMonth.title;
-      var hackathonHost = JSONInput.givenMonth.host;
-      var hackathonURL = JSONInput.givenMonth.url;
-      var startDate = JSONInput.givenMonth.startDate;
-      var endDate = JSONInput.givenMonth.endDate;
-      
-      geocoder.geocode( { 'address': givenAddress}, function(results, status) {
-        
-        if (status == google.maps.GeocoderStatus.OK) {
-          latLngAddress = results[0].geometry.location;
-          // creates a new marker with the address gained by geocoding
-          var marker = new google.maps.Marker({
-              map: map,
-              position: latLngAddress,
-              icon: markerIcon,
-              clickable: true
-          });
-          // infowindow is created and attached to the marker
-          marker.info = new google.maps.InfoWindow({
-            content: "<div class='infowindow'> <b> Name: </b> " + hackathonName + "<br> <b> Host </b>: " + hackathonHost + "<br> <b>Address: </b>" + givenAddress + "<br> <b> Website: </b><a href=" + hackathonURL + ">" + hackathonURL +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>"
-          });
+      var givenMonth = convertIntToMonth(month);
+      var numOfHackathonsInThatMonth = JSONInput[givenMonth].length;
+        for (var i = 0; i < numOfHackathonsInThatMonth; i++) {
+          var givenAddress = JSON.stringify(JSONInput[givenMonth][i].city);
+          var geocoder = new google.maps.Geocoder();
+          var latLngAddress;
+          // grabs the data from Hackalist API and assigns them to variables
+          var hackathonName = JSONInput[givenMonth][i].title;
+          var hackathonHost = JSONInput[givenMonth][i].host;
+          var hackathonURL = JSONInput[givenMonth][i].url;
+          var startDate = JSONInput[givenMonth][i].startDate;
+          var endDate = JSONInput[givenMonth][i].endDate;
 
-          google.maps.event.addListener(marker, 'click', function() {
-            marker.info.open(map, marker);
+          geocoder.geocode( { 'address': givenAddress}, function(results, status) {
+
+            if (status == google.maps.GeocoderStatus.OK) {
+              latLngAddress = results[0].geometry.location;
+              // creates a new marker with the address gained by geocoding
+              var marker = new google.maps.Marker({
+                  map: map,
+                  position: latLngAddress,
+                  icon: markerIcon,
+                  clickable: true
+              });
+              // infowindow is created and attached to the marker
+              marker.info = new google.maps.InfoWindow({
+                content: "<div class='infowindow'> <b> Name: </b> " + hackathonName + "<br> <b> Host </b>: " + hackathonHost + "<br> <b>Address: </b>" + givenAddress + "<br> <b> Website: </b><a href=" + hackathonURL + ">" + hackathonURL +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>"
+              }); 
+
+              google.maps.event.addListener(marker, 'click', function() {
+                marker.info.open(map, marker);
+              });
+            };
           });
-        };
-      });
+        }
     }
     /**
      * Creates the map; see this as the main function
