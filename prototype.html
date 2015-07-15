@@ -25,7 +25,7 @@
     function InstructionScreen(openScreenDiv,map) {
       // creates a div HTML element to hold the UI
       var openScreenUI = document.createElement("div");
-      openScreenUI.style.backgroundColor = '#ea6153';
+      openScreenUI.style.backgroundColor = '#8e44ad';
       openScreenUI.style.border = '2px solid #333';
       openScreenUI.style.borderRadius = '10px';
       openScreenUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
@@ -53,7 +53,7 @@
       // creates a div HTML element to hold the UI
       var nextButton = document.createElement("div");
       nextButton.style.cursor = 'pointer';
-      nextButton.style.backgroundColor = '#ea6153';
+      nextButton.style.backgroundColor = '#8e44ad';
       nextButton.style.border = '2px solid #333';
       nextButton.style.borderRadius = '10px';
       nextButton.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
@@ -213,6 +213,10 @@
 
             if (status == google.maps.GeocoderStatus.OK) {
               latLngAddress = results[0].geometry.location;
+              // infowindow is created and attached to the marker
+              var markerInfo = new google.maps.InfoWindow({
+                content: "<div class='infowindow'> <b> Name: </b> " + hackathonName + "<br> <b> Host </b>: " + hackathonHost + "<br> <b>Address: </b>" + givenAddress + "<br> <b> Website: </b><a href=" + hackathonURL + ">" + hackathonURL +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>"
+              }); 
               // creates a new marker with the address gained by geocoding
               var marker = new google.maps.Marker({
                   map: map,
@@ -220,18 +224,21 @@
                   icon: markerIcon,
                   clickable: true
               });
-              // infowindow is created and attached to the marker
-              marker.info = new google.maps.InfoWindow({
-                content: "<div class='infowindow'> <b> Name: </b> " + hackathonName + "<br> <b> Host </b>: " + hackathonHost + "<br> <b>Address: </b>" + givenAddress + "<br> <b> Website: </b><a href=" + hackathonURL + ">" + hackathonURL +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>"
-              }); 
 
-              google.maps.event.addListener(marker, 'click', function() {
-                marker.info.open(map, marker);
-              });
-            };
+            }
           });
         }
     }
+
+    /**
+     * Clear previously selected markers and infowindows
+     **/
+    function clearAllMarkersAndInfo() {
+
+    }
+
+
+
     /**
      * Creates the map; see this as the main function
      **/
@@ -292,7 +299,7 @@
           <option value='2014'> 2014 </option> 
           <option value='2015'> 2015 </option>
         </select>
-        <a href="#" onclick="getMarkerFromChosenTime()" class="action-button shadow animate blue">Lets Go!</a> 
+        <button onclick="getMarkerFromChosenTime()" class="action-button shadow animate blue">Lets Go!</button> 
         <select id="monthSelect">
           <option value="" disabled selected>Month</option>
           <option value="01">January</option>
