@@ -15,6 +15,8 @@
     var markers = new Array(); // to refer to the array of markers
     var infowindows = new Array(); // to refer to the infowindows attached to the markers
     var openInfoWindows = new Array(); // to refer to the infowindows that are open right now
+    var detailsForEachHackathon = new Array(); // to contain the objects needed for each hackathon, remove this and geocoding creates a bug
+    var x = 0; // for geocoding purposes as they need a global variable to refer to the index of the array
     var markerIcon = "https://cloud.githubusercontent.com/assets/9067177/8510467/e281c302-22b3-11e5-8ea4-08b55c12845a.png"; // The standard icon for the marker
    
     /*** Functions ***/
@@ -34,6 +36,7 @@
       openScreenUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
       openScreenUI.style.marginBottom = '10em';
       openScreenUI.style.textAlign = 'center';
+      openScreenUI.style.width = '100%';
       openScreenDiv.appendChild(openScreenUI);
 
       // creates another div inside to hold text
@@ -195,7 +198,7 @@
     /**
      * Converts the Addresses into LatLng format with Geocoding
      * Takes JSON data as Input where address information is used
-     * Also confirms the month
+     * Also confirms the month by taking it as integer format and turning into a string of the month name
      * Puts a marker onto the map with the details of the hackathon
      **/
     function convertAddressesToMarker(JSONInput,month) {
@@ -205,7 +208,6 @@
         for (var i = 0; i < numOfHackathonsInThatMonth; i++) {
           var givenAddress = JSON.stringify(JSONInput[givenMonth][i].city);
           var geocoder = new google.maps.Geocoder();
-          var latLngAddress;
           // grabs the data from Hackalist API and assigns them to variables
           var cityName = JSONInput[givenMonth][i].city;
           var hackathonName = JSONInput[givenMonth][i].title;
@@ -213,29 +215,37 @@
           var hackathonUrl = JSONInput[givenMonth][i].url;
           var startDate = JSONInput[givenMonth][i].startDate;
           var endDate = JSONInput[givenMonth][i].endDate;
-
+          // creates an object to store the details of the hackathon as geocoder screws things up
+          var hackathonDetails = {
+            city: cityName,
+            eventName: hackathonName,
+            organizers:hackathonHost,
+            url:hackathonUrl,
+            begin:startDate,
+            end:endDate
+          };
+          detailsForEachHackathon.push(hackathonDetails);
+          // geocoder takes in the address and returns latitude and longitude
           geocoder.geocode( { 'address': givenAddress}, function(results, status) {
-
             if (status == google.maps.GeocoderStatus.OK) {
-              latLngAddress = results[0].geometry.location;
-              // creates a new marker with the address gained by geocoding
+              var latLngAddress = results[0].geometry.location;
+              // creates a new marker
               var marker = new google.maps.Marker({
-                  map: map,
-                  position: latLngAddress,
-                  icon: markerIcon,
-                  clickable: true
+                map: map,
+                icon: markerIcon,
+                position: latLngAddress,
+                clickable: true
               });
-
-              marker.set("city", cityName);
-              marker.set("eventName", hackathonName);
-              marker.set("host",hackathonHost);
-              marker.set("url", hackathonUrl);
-              marker.set("start", startDate);
-              marker.set("end", endDate);
-              
-			  google.maps.event.addListener(marker, 'click', attachInfoWindow(marker)); 
+              // sets the attributes of the marker by taking it from the hackathonDetails Object
+              marker.set("city", detailsForEachHackathon[x].city);
+              marker.set("eventName", detailsForEachHackathon[x].eventName);
+              marker.set("host", detailsForEachHackathon[x].organizers);
+              marker.set("url", detailsForEachHackathon[x].url);
+              marker.set("start", detailsForEachHackathon[x].begin);
+              marker.set("end", detailsForEachHackathon[x].end);
+			        google.maps.event.addListener(marker, 'click', attachInfoWindow(marker)); 
               markers.push(marker);
-
+              x++;
             } else if (status == google.maps.GeocoderStatus.ZERO_RESULTS){
             	console.log("There was an error geocoding this address");
             }
@@ -246,9 +256,10 @@
     /**
      * Attaches the infowindow to the marker
      * Takes the marker
-	 **/
+	   **/
 	 function attachInfoWindow(marker) {
 	 	return function(event) {
+      // grabs attributes from marker to put into the infowindow
 	 		var city = marker.get("city");
 	 		var eventName = marker.get("eventName");
 	 		var host = marker.get("host");
@@ -256,9 +267,10 @@
 	 		var startDate = marker.get("start");
 	 		var endDate = marker.get("end");
 	 		var contentString = "<div class='infowindow'> <b> Name: </b> " + eventName + "<br> <b> Host </b>: " + host + "<br> <b>Address: </b>" + city + "<br> <b> Website: </b><a href=" + url + ">" + url +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>";
+      // creates the infowindow
 	 		var markerInfo = new google.maps.InfoWindow({disableAutoPan: true});
 	 		markerInfo.setContent(contentString);
-	 		markerInfo.setPosition(event.latLng);
+	 		markerInfo.setPosition({lat: event.latLng.lat() + 1, lng: event.latLng.lng()});
 	 		markerInfo.open(map);
 	 		infowindows.push(markerInfo);
 	 		openInfoWindows.push(markerInfo);
@@ -285,8 +297,24 @@
 				infowindows.pop();
 			}
 		}
-    }
-
+  }
+    /**
+     * [setInfoWindow description]
+     *  
+    function setInfoWindow(marker) {
+        google.maps.event.addListener(marker, 'click', function(event) {
+            var infoWindow = new google.maps.InfoWindow();
+            var city = marker.get("city");
+            var eventName = marker.get("eventName");
+            var host = marker.get("host");
+            var url = marker.get("url");
+            var startDate = marker.get("start");
+            var endDate = marker.get("end");
+            var contentString = "<div class='infowindow'> <b> Name: </b> " + eventName + "<br> <b> Host </b>: " + host + "<br> <b>Address: </b>" + city + "<br> <b> Website: </b><a href=" + url + ">" + url +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>";
+            infoWindow.setContent(contentString);
+            infoWindow.open(map, this);
+        });
+    } */
 
 
     /**
