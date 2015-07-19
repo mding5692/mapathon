@@ -9,6 +9,7 @@
       <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
     <link href="./css/style.css" rel="stylesheet">    
     <script>
+    /** NOTE THAT VANILLA/PURE JAVASCRIPT IS USED HERE INSTEAD OF JQUERY TO MAKE SURE THE MAP CAN BE USED PRETTY MUCH EVERYWHERE THAT ALLOWS JAVASCRIPT **/
     
     /*** Global variables ***/
     var map; // To reference the map
@@ -16,8 +17,10 @@
     var infowindows = new Array(); // to refer to the infowindows attached to the markers
     var openInfoWindows = new Array(); // to refer to the infowindows that are open right now
     var detailsForEachHackathon = new Array(); // to contain the objects needed for each hackathon, remove this and geocoding creates a bug
+    var lastHackathonAddress; // just to center the map on something near the group of hackathon markers
     var x = 0; // for geocoding purposes as they need a global variable to refer to the index of the array
     var markerIcon = "https://cloud.githubusercontent.com/assets/9067177/8510467/e281c302-22b3-11e5-8ea4-08b55c12845a.png"; // The standard icon for the marker
+    var numOfAlertsAbout2014 = 0; // recording this to not annoy user
    
     /*** Functions ***/
     
@@ -30,9 +33,10 @@
     function InstructionScreen(openScreenDiv,map) {
       // creates a div HTML element to hold the UI
       var openScreenUI = document.createElement("div");
+      openScreenUI.style.marginLeft = "2em";
       openScreenUI.style.backgroundColor = '#8e44ad';
       openScreenUI.style.border = '2px solid #333';
-      openScreenUI.style.borderRadius = '10px';
+      openScreenUI.style.borderRadius = '5px';
       openScreenUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
       openScreenUI.style.marginBottom = '10em';
       openScreenUI.style.textAlign = 'center';
@@ -42,11 +46,11 @@
       // creates another div inside to hold text
       var openingScreenText = document.createElement('div');
       openingScreenText.style.color = '#fff';
-      openingScreenText.style.fontSize = '16px';
-      openingScreenText.style.lineHeight = '38px';
+      openingScreenText.style.fontSize = '14px';
+      openingScreenText.style.lineHeight = '20px';
       openingScreenText.style.paddingLeft = '10em';
       openingScreenText.style.paddingRight = '10em';
-      openingScreenText.innerHTML = " <b> Instructions : </b> Choose the year and the month and get a display of the hackathons around the world at that time, press <b> next </b> to close the instructions ";
+      openingScreenText.innerHTML = " <b> Instructions : </b> Choose the year and the month and get a display of the hackathons around the world at that time, press <b> next </b> to close the instructions. <br> <br>Also note that I have only displayed at max 20 hackathons as thats the Google Maps API Geocoding Query Limit! ";
       openScreenUI.appendChild(openingScreenText);
 
     }
@@ -63,7 +67,8 @@
       nextButton.style.border = '2px solid #333';
       nextButton.style.borderRadius = '10px';
       nextButton.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
-      nextButton.style.marginBottom = '10em';
+      nextButton.style.marginBottom = '5em';
+      nextButton.style.marginRight = '5em';
       nextButton.style.textAlign = 'center';
       openScreenDiv.appendChild(nextButton);
 
@@ -238,54 +243,25 @@
               });
               // sets the attributes of the marker by taking it from the hackathonDetails Object
               marker.set("city", detailsForEachHackathon[x].city);
+              console.info(marker.get("city"));
               marker.set("eventName", detailsForEachHackathon[x].eventName);
               marker.set("host", detailsForEachHackathon[x].organizers);
               marker.set("url", detailsForEachHackathon[x].url);
               marker.set("start", detailsForEachHackathon[x].begin);
               marker.set("end", detailsForEachHackathon[x].end);
-			        google.maps.event.addListener(marker, 'click', attachInfoWindow(marker)); 
+              // sets an infowindow for the marker
+              setInfoWindow(marker);
               markers.push(marker);
+              lastHackathonAddress = latLngAddress;
               x++;
+              console.log(x);
             } else if (status == google.maps.GeocoderStatus.ZERO_RESULTS){
-            	console.log("There was an error geocoding this address");
+            	console.error("There was an error geocoding this address");
+              markers.push();
             }
           });
         }
     }
-
-    /**
-     * Attaches the infowindow to the marker
-     * Takes the marker
-	   **/
-	 function attachInfoWindow(marker) {
-	 	return function(event) {
-      // grabs attributes from marker to put into the infowindow
-	 		var city = marker.get("city");
-	 		var eventName = marker.get("eventName");
-	 		var host = marker.get("host");
-	 		var url = marker.get("url");
-	 		var startDate = marker.get("start");
-	 		var endDate = marker.get("end");
-	 		var contentString = "<div class='infowindow'> <b> Name: </b> " + eventName + "<br> <b> Host </b>: " + host + "<br> <b>Address: </b>" + city + "<br> <b> Website: </b><a href=" + url + ">" + url +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>";
-      // creates the infowindow
-	 		var markerInfo = new google.maps.InfoWindow({disableAutoPan: true});
-	 		markerInfo.setContent(contentString);
-	 		markerInfo.setPosition({lat: event.latLng.lat() + 1, lng: event.latLng.lng()});
-	 		markerInfo.open(map);
-	 		infowindows.push(markerInfo);
-	 		openInfoWindows.push(markerInfo);
-	 		// closes previous infowindow if there is another
-			if (openInfoWindows.length > 1) {
-				openInfoWindows[0].close();
-				openInfoWindows[0] = openInfoWindows[1];
-				openInfoWindows.pop();
-			}
-			// if click elsewhere on the map, infowindow closes
-			google.maps.event.addListener(map, 'click', function() {
-				markerInfo.close();
-			});
-	 	}; 	     
-	 }
     /**
      * Clear previously selected markers and infowindows if there are any
      **/
@@ -299,11 +275,12 @@
 		}
   }
     /**
-     * [setInfoWindow description]
-     *  
+     * Attaches the infowindow to the marker
+     * Takes the marker
+     **/ 
     function setInfoWindow(marker) {
         google.maps.event.addListener(marker, 'click', function(event) {
-            var infoWindow = new google.maps.InfoWindow();
+            var infoWindow = new google.maps.InfoWindow({disableAutoPan: true});
             var city = marker.get("city");
             var eventName = marker.get("eventName");
             var host = marker.get("host");
@@ -312,9 +289,21 @@
             var endDate = marker.get("end");
             var contentString = "<div class='infowindow'> <b> Name: </b> " + eventName + "<br> <b> Host </b>: " + host + "<br> <b>Address: </b>" + city + "<br> <b> Website: </b><a href=" + url + ">" + url +"</a>" + "<br> <b> Starting date : </b>" + startDate + "<br> <b> Ending date : </b>" + endDate + "</div>";
             infoWindow.setContent(contentString);
+            infowindows.push(infoWindow);
+            openInfoWindows.push(infoWindow);
             infoWindow.open(map, this);
+            // closes previous infowindow if there is another
+            if (openInfoWindows.length > 1) {
+              openInfoWindows[0].close();
+              openInfoWindows[0] = openInfoWindows[1];
+              openInfoWindows.pop();
+            }
+            // if click elsewhere on the map, infowindow closes
+            google.maps.event.addListener(map, 'click', function() {
+              infoWindow.close();
+            });
         });
-    } */
+    } 
 
 
     /**
@@ -337,7 +326,7 @@
       var instructionScreenDiv = document.createElement('div');
       var instructionScreen = new InstructionScreen(instructionScreenDiv, map);
       instructionScreenDiv.index = 1;
-      map.controls[google.maps.ControlPosition.LEFT_CENTER].push(instructionScreenDiv);
+      map.controls[google.maps.ControlPosition.TOP_LEFT].push(instructionScreenDiv);
 
       // creates the next Button
       var nextButtonDiv = document.createElement('div');
@@ -346,11 +335,12 @@
       nextButtonDiv.index = 1;
       map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(nextButtonDiv);
 
-      // times it for 3 seconds before next Button appears
+      // times it for 1 seconds before before next button appears
       var count = 0;
       setInterval(function(){ 
         count++;
-        if (count == 2) {
+        // next button appears
+        if (count == 1) {
           fadeIn(nextButtonDiv);
         }
       }, 1000);
@@ -359,7 +349,6 @@
       google.maps.event.addDomListener(nextButtonDiv, 'click', function() {
         fadeOut(instructionScreenDiv);
         fadeOut(nextButtonDiv);
-
       });  
     }
       google.maps.event.addDomListener(window, 'load', initialize);
@@ -371,8 +360,9 @@
   <body>
     
     <div id="map_canvas"></div>
-    <div class="container">  
-        <select id="yearSelect">
+    <div id="arrow"></div>
+    <div id="container">  
+        <select id="yearSelect" onchange="hideIf2014IsChosen()">
           <option value="" disabled selected>Year</option>
           <option value='2014'> 2014 </option> 
           <option value='2015'> 2015 </option>
@@ -380,19 +370,45 @@
         <button onclick="getMarkerFromChosenTime()" class="action-button shadow animate blue">Lets Go!</button> 
         <select id="monthSelect">
           <option value="" disabled selected>Month</option>
-          <option value="01">January</option>
-            <option value="02">February</option>
-            <option value="03">March</option>
-            <option value="04">April</option>
-            <option value="05">May</option>
-            <option value="06">June</option>
-            <option value="07">July</option>
+          <option value="01" class="hideIf2014">January</option>
+            <option value="02" class="hideIf2014">February</option>
+            <option value="03" class="hideIf2014">March</option>
+            <option value="04" class="hideIf2014">April</option>
+            <option value="05" class="hideIf2014">May</option>
+            <option value="06" class="hideIf2014">June</option>
+            <option value="07" class="hideIf2014">July</option>
             <option value="08">August</option>
             <option value="09">September</option>
             <option value="10">October</option>
             <option value="11">November</option>
-            <option value="12">December</option>
+            <option value="12" class="hideIf2014">December</option>
         </select>
     </div>
+    <script>
+    /**
+     * [Checks to see if 2014 is chosen, if it is then take out all the monthes before August as its not available]
+     */
+      function hideIf2014IsChosen() {
+        var checkIf2014IsChosen = getYear();
+        var arrayOfMonthesBeforeAugust2014 = document.getElementsByClassName("hideIf2014");
+        if (checkIf2014IsChosen === '2014') {
+          // just to not annoy the user with way too many alerts
+          if (numOfAlertsAbout2014 === 0) {
+          alert("Hackalist API doesn't have hackathons listed before August 2014, so they've been removed");
+          }
+          // removes those options from selection
+          for (var i = 0; i < arrayOfMonthesBeforeAugust2014.length; i++) {
+            arrayOfMonthesBeforeAugust2014[i].style.display = "none";
+          }
+          numOfAlertsAbout2014++;
+        } else {
+          // ensures for 2015 that they can choose monthes before August
+          for (var i = 0; i < arrayOfMonthesBeforeAugust2014.length; i++) {
+            arrayOfMonthesBeforeAugust2014[i].style.display = "inline-block";
+          }
+        } 
+      }
+    </script>
+    <p> Send any bugs you notice to github.com/mding5692/mapathon as an issue please </p>
  </body>
 </html>
