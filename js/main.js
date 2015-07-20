@@ -9,7 +9,6 @@
     var infowindows = new Array(); // to refer to the infowindows attached to the markers
     var openedInfoWindow = ""; // to refer to the infowindow that is open right now
     var detailsForEachHackathon = new Array(); // to contain the objects needed for each hackathon, remove this and geocoding creates a bug
-    var lastHackathonAddress; // just to center the map on something near the group of hackathon markers
     var x = 0; // for geocoding purposes as they need a global variable to refer to the index of the array
     var markerIcon = "https://cloud.githubusercontent.com/assets/9067177/8510467/e281c302-22b3-11e5-8ea4-08b55c12845a.png"; // The standard icon for the marker
     var numOfAlertsAbout2014 = 0; // recording this to not annoy user
@@ -257,6 +256,9 @@
     function clearAllMarkersAndInfo() {
     	for (var j = 0; j < markers.length; j++) {
 			markers[j].setMap(null);
+			if(detailsForEachHackathon[j]) {
+				detailsForEachHackathon.pop();
+			}
 			if (infowindows[j]) {
 				infowindows[j].close();
 				infowindows.pop();
