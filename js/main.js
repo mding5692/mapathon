@@ -254,11 +254,10 @@
      * Clear previously selected markers and infowindows if there are any
      **/
     function clearAllMarkersAndInfo() {
+      geocoder = new google.maps.Geocoder();
+      detailsForEachHackathon = new Array();
     	for (var j = 0; j < markers.length; j++) {
 			markers[j].setMap(null);
-			if(detailsForEachHackathon[j]) {
-				detailsForEachHackathon.pop();
-			}
 			if (infowindows[j]) {
 				infowindows[j].close();
 				infowindows.pop();
