@@ -41,7 +41,7 @@
       openingScreenText.style.lineHeight = '20px';
       openingScreenText.style.paddingLeft = '10em';
       openingScreenText.style.paddingRight = '10em';
-      openingScreenText.innerHTML = " <b> Instructions : </b> Choose the year and the month and get a display of the hackathons around the world at that time, press <b> next </b> to close the instructions.";
+      openingScreenText.innerHTML = " <b> Instructions : </b> Choose the year and the month at the bottom and get a display of the hackathons around the world at that time.";
       openScreenUI.appendChild(openingScreenText);
 
     }
