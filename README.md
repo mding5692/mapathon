@@ -10,6 +10,8 @@ Current contributors:
 
 <a href="https://www.github.com/mding5692">Michael Ding</a>
 
+<a href="https://github.com/KevinPayravi">Kevin Payravi</a>
+
 Current Functionality:
 - Shows location of hackathons with ability to be pressed for more details
 
