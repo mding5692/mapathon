@@ -1,22 +1,31 @@
 # mapathon
-For ChallengePost "Maps As Art" online hackathon submission
+Previously created for the Devpost "Maps As Art" online hackathon submission
 [![Stories in Ready](https://badge.waffle.io/mding5692/mapathon.png?label=ready&title=Ready)](http://waffle.io/mding5692/mapathon)
 
-Criteria: Reimagine the world around you and unleash your inner cartographer. Create a ‘wall worthy’ interactive map that illustrates one way in which you see the world. (Bonus points for going 3D!)
+Special thanks to the Hackalist guys for maintaining their API so I can grab their data!
 
+<a href="http://www.hackalist.org/">HACKALIST</a>
 
-Should also determine your location and then find the nearest hackathon and possible routes, determines if you need travel reimbursement.
+Current contributors:
 
+<a href="https://www.github.com/mding5692">Michael Ding</a>
 
-Currently grabbing data from :
+Current Functionality:
+- Shows location of hackathons with ability to be pressed for more details
 
-  - Hackalist : http://www.hackalist.org/
-  - Major League Hacking : https://mlh.io/
-  - Hacker League : https://www.hackerleague.org
+Current bugs
+- Cannot go past Google Maps Geocoding Query limits - currently using a workaround
+
+Future Directions
+- More Hackathon locations
+- Dynamically update hackathons based on API
+- See if travel reimbursements are needed based on current location
+
+Considering other data sources:
+
+  - Major League Hacking : https://github.com/mikachoow21/mlh-api   (unofficial mlh api)
+  - Hacker League : https://www.mashape.com/ismaelc/hackerleague-search 
   - MIT's Health Hacking Database : http://hackingmedicine.mit.edu/health-hackathon-database/
-
-Considering :
-
   - Hackathon.io
   - Open Data Day Map : https://docs.google.com/spreadsheets/d/1cV43fuzwy2q2ZKDWrHVS6XR4O8B01eLevh4PD6nCENE/edit#gid=11
   <br>  (Note the above already has a map with hackathons)
