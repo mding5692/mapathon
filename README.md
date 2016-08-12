@@ -3,13 +3,18 @@ Previously created for the Devpost "Maps As Art" online hackathon submission
 [![Stories in Ready](https://badge.waffle.io/mding5692/mapathon.png?label=ready&title=Ready)](http://waffle.io/mding5692/mapathon)
 
 Special thanks to the Hackalist guys for maintaining their API so I can grab their data!
+
 <a href="http://www.hackalist.org/">HACKALIST</a>
 
 Current contributors:
+
 <a href="https://www.github.com/mding5692">Michael Ding</a>
 
 Current Functionality:
 - Shows location of hackathons with ability to be pressed for more details
+
+Current bugs
+- Cannot go past Google Maps Geocoding Query limits - currently using a workaround
 
 Future Directions
 - More Hackathon locations
