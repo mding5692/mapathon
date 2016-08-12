@@ -243,3 +243,24 @@ a {
 @media screen and (max-width: 42em) {
   .site-footer {
     font-size: 0.9rem; } }
+
+
+#locationControlDiv {
+  width: 24px;
+  height: 24px;
+  background-color: #fff;
+  border: 2px solid #fff;
+  border-radius: 1px;
+  box-shadow: 0 1px 0px rgba(0,0,0,0.1);
+  cursor: pointer;
+  text-align : center;
+  margin: 20px 40px;
+  color: rgba(25,25,25,0.7);
+  font-family: Roboto,Arial,sans-serif;
+  font-size: 8px;
+  z-index: 999;
+}
+
+#locationControlDiv:hover {
+  color: rgba(25,25,25,0.9);
+}
