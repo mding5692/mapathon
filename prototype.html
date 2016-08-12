@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <title>Mapathon - Mapping upcoming and past hackathons by month</title>
     <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
-    <link href="./css/style.css" rel="stylesheet">   
+    <link href="./css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script src="./js/main.js"></script>
     <script src="./js/buttons.js"></script>
   </head>
   <body>
-    
+    <button id="locationControlDiv"><i class="material-icons">gps_fixed</i></button>
     <div id="map_canvas"></div>
     <div id="arrow"></div>
-    <div id="container">  
+    <div id="container">
         <select id="yearSelect" onchange="hideIf2014IsChosen()">
           <option value="" disabled selected>Year</option>
           <option value='2014'> 2014 </option>
@@ -39,4 +40,5 @@
     </div>
     <p> Send any bugs you notice to github.com/mding5692/mapathon as an issue please </p>
  </body>
+
 </html>
