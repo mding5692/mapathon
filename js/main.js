@@ -1,7 +1,8 @@
 
 /** NOTE THAT VANILLA/PURE JAVASCRIPT IS USED HERE INSTEAD OF JQUERY TO MAKE SURE THE MAP CAN BE USED PRETTY MUCH EVERYWHERE THAT ALLOWS JAVASCRIPT **/
-    
+
     /*** Global variables ***/
+    var myLocationMarker = null; //my location marker
     var bounds = new google.maps.LatLngBounds(); // defines the bounds of the map
     var geocoder = new google.maps.Geocoder(); // Used to point out locations on google maps with a physical address
     var map; // To reference the map
@@ -12,15 +13,94 @@
     var x = 0; // for geocoding purposes as they need a global variable to refer to the index of the array
     var markerIcon = "https://cloud.githubusercontent.com/assets/9067177/8510467/e281c302-22b3-11e5-8ea4-08b55c12845a.png"; // The standard icon for the marker
     var numOfAlertsAbout2014 = 0; // recording this to not annoy user
-   
+
+
+    /**
+     * Creates the map; see this as the main function for the UI
+     **/
+    function initialize() {
+     // below is configurable content for the map
+     map = new google.maps.Map(document.getElementById('map_canvas'), {
+       zoom: 4,
+       minZoom: 3,
+       center: {lat: -34.397, lng: 150.644},
+       styles: [{"featureType":"all","elementType":"all","stylers":[{"invert_lightness":true},{"saturation":10},{"lightness":30},{"gamma":0.5},{"hue":"#435158"}]}],
+       disableDefaultUI: true
+     });
+
+     /*add the get location button*/
+     var locationControlDiv = document.getElementById("locationControlDiv");
+     var locationControl = new LocationControl(map);
+
+    locationControlDiv.index = 2;
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(locationControlDiv);
+
+      /** Sets up the UI and instructions **/
+
+      // creates the instructions for user to read
+      var instructionScreenDiv = document.createElement('div');
+      var instructionScreen = new InstructionScreen(instructionScreenDiv, map);
+      instructionScreenDiv.index = 1;
+      map.controls[google.maps.ControlPosition.TOP_LEFT].push(instructionScreenDiv);
+
+      // closes the instructions after submit button is pressed and loads selections
+      var btn = document.getElementById("btn");
+      google.maps.event.addDomListener(btn, 'click', function() {
+        fadeOut(instructionScreenDiv);
+      });
+    }
+      google.maps.event.addDomListener(window, 'load', initialize);
+
+
     /*** Functions ***/
-    
+
                     /******* UI and Animation functions *******/
+
+    /**/
+function LocationControl(map){
+  var locationControlDiv = document.getElementById("locationControlDiv");
+  // Setup the click event listeners: simply set the map to Chicago.
+  locationControlDiv.addEventListener('click', function() {
+    console.log("click");
+    GetCurrentLocation(map);
+  });
+}
+
+function GetCurrentLocation(map){
+  //delete old myLocationMarker, if it exist
+  if (myLocationMarker !== null){
+    myLocationMarker.setMap(null);
+  }
+
+  // Try HTML5 geolocation.
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+    var pos = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude
+    };
+
+    SetMyLocationMarker(pos, map);
+    map.setCenter(pos);
+    }, function() {
+      //handleLocationError(true, map.getCenter());
+    });
+  }
+}
+
+function SetMyLocationMarker(pos, map){
+  myLocationMarker = new google.maps.Marker({
+    position: pos,
+    map: map,
+    animation: google.maps.Animation.DROP,
+    title: 'Your Location'
+  });
+}
 
     /**
      * Pops out opening screen with instructions on how to use it
      * Takes in the div to be used to store openingScreen and the map its for
-     **/ 
+     **/
     function InstructionScreen(openScreenDiv,map) {
       // creates a div HTML element to hold the UI
       var openScreenUI = document.createElement("div");
@@ -76,27 +156,27 @@
           op -= op * 0.1;
     }, 50);
   }
-                        
+
                     /****** Data and Map functions ******/
 
     /**
-     * Returns the year chosen by user with the select html element 
+     * Returns the year chosen by user with the select html element
      **/
     function getYear() {
         var yearSelect = document.getElementById('yearSelect');
-        var chosenYear = yearSelect.options[yearSelect.selectedIndex].value;      
+        var chosenYear = yearSelect.options[yearSelect.selectedIndex].value;
         return chosenYear;
     }
-        
+
     /**
-     * Returns the year chosen by user with the select html element 
+     * Returns the year chosen by user with the select html element
      **/
     function getMonth() {
         var monthSelect = document.getElementById('monthSelect');
-        var chosenMonth = monthSelect.options[monthSelect.selectedIndex].value;      
+        var chosenMonth = monthSelect.options[monthSelect.selectedIndex].value;
         return chosenMonth;
     }
-        
+
     /**
      * Take a month in integer format and converts it to string
      **/
@@ -118,7 +198,7 @@
         var convertedMonth = month[monthAsInt];
         return convertedMonth;
     }
-        
+
     /**
      * Gets the year and month chosen and outputs marker on the map
      * Creates an error if there is no year or month
@@ -148,7 +228,7 @@
       var URL = "http://www.hackalist.org/api/1.0/" + yearStr + "/" + monthStr + ".json";
       return URL;
     }
-    
+
     /**
      * Gets the JSON data from Hackalist API
      * Returns as JSON
@@ -190,9 +270,9 @@
           };
       detailsForEachHackathon.push(hackathonDetails);
     }
-  } 
+  }
     /**
-     * Creates markers on the map using an array of hackathon information 
+     * Creates markers on the map using an array of hackathon information
      */
     function createMarkersFromHackathonDetails() {
       var bounds = new google.maps.LatLngBounds();
@@ -264,33 +344,3 @@
 			}
 		}
   }
-
-    /**
-     * Creates the map; see this as the main function for the UI
-     **/
-    function initialize() {
-     // below is configurable content for the map
-      var mapOptions = {
-        zoom: 4,
-        minZoom: 3,
-        center: {lat: -34.397, lng: 150.644},
-        styles: [{"featureType":"all","elementType":"all","stylers":[{"invert_lightness":true},{"saturation":10},{"lightness":30},{"gamma":0.5},{"hue":"#435158"}]}],
-        disableDefaultUI: true
-      }; 
-      map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-      
-      /** Sets up the UI and instructions **/
-
-      // creates the instructions for user to read
-      var instructionScreenDiv = document.createElement('div');
-      var instructionScreen = new InstructionScreen(instructionScreenDiv, map);
-      instructionScreenDiv.index = 1;
-      map.controls[google.maps.ControlPosition.TOP_LEFT].push(instructionScreenDiv);
-
-      // closes the instructions after submit button is pressed and loads selections
-      var btn = document.getElementById("btn");
-      google.maps.event.addDomListener(btn, 'click', function() {
-        fadeOut(instructionScreenDiv);
-      });  
-    }
-      google.maps.event.addDomListener(window, 'load', initialize);
