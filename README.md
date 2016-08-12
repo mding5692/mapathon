@@ -1,19 +1,22 @@
 # mapathon
-For ChallengePost "Maps As Art" online hackathon submission
+Previously created for the Devpost "Maps As Art" online hackathon submission
 [![Stories in Ready](https://badge.waffle.io/mding5692/mapathon.png?label=ready&title=Ready)](http://waffle.io/mding5692/mapathon)
 
-Criteria: Reimagine the world around you and unleash your inner cartographer. Create a ‘wall worthy’ interactive map that illustrates one way in which you see the world. (Bonus points for going 3D!)
+Special thanks to the Hackalist guys for maintaining their API so I can grab their data!
+<a href="http://www.hackalist.org/">HACKALIST</a>
 
+Current contributors:
+<a href="https://www.github.com/mding5692">Michael Ding</a>
 
-Should also determine your location and then find the nearest hackathon and possible routes, determines if you need travel reimbursement.
+Current Functionality:
+- Shows location of hackathons with ability to be pressed for more details
 
+Future Directions
+- More Hackathon locations
+- Dynamically update hackathons based on API
+- See if travel reimbursements are needed based on current location
 
-Currently grabbing data from :
-
-  - Hackalist : http://www.hackalist.org/
-
-
-Considering :
+Considering other data sources:
 
   - Major League Hacking : https://github.com/mikachoow21/mlh-api   (unofficial mlh api)
   - Hacker League : https://www.mashape.com/ismaelc/hackerleague-search 
