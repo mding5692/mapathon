@@ -15,6 +15,8 @@ Current contributors:
 
 <a href="https://github.com/KevinPayravi">Kevin Payravi</a>
 
+<a href="https://github.com/NeoZhangTCL">Neo Zhang</a>
+
 If anyone is interested in joining, please create an issue and post details of what you want to help with and what you're good at - We appreciate all the support we can get!
 
 Current Functionality:
