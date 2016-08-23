@@ -28,12 +28,20 @@
        disableDefaultUI: true
      });
 
+	 /* Maybe create a dropdown where u can select options like locationCtrl or Discover instead */
+	 
      /*add the get location button*/
      var locationControlDiv = document.getElementById("locationControlDiv");
      var locationControl = new LocationControl(map);
 
     locationControlDiv.index = 2;
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(locationControlDiv);
+	
+	/* add the discover button */
+	 var discoverBtn = document.getElementById("discoverBtn");
+	 discoverBtn.index = 2;
+	 map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(discoverBtn);
+	 
 
       /** Sets up the UI and instructions **/
 
