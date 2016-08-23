@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mapathon - Mapping upcoming and past hackathons by month</title>
+    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Gudea|Righteous' type='text/css'>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="./css/ui.css">
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="./js/ui.js"></script>
+</head>
+
+<body>
+    <label for="nav-icon">
+        <input type="checkbox" id="nav-icon" />
+        <div class="container">
+            <div class="menu"></div>
+        </div>
+    </label>
+    <div id="side">
+        <h1>Mapathon</h1>
+        <div id="inner-text">
+          <div class="selectholder">
+            <select id="yearSelect" onchange="hideIf2014IsChosen()">
+                <option value="">Year</option>
+                <option value='2014'> 2014 </option>
+                <option value='2015'> 2015 </option>
+                <option value='2016'> 2016 </option>
+            </select>
+          </div>
+          <div class="selectholder">
+            <select id="monthSelect" onchange="clearAllMarkersAndInfo()">
+                <option value="" selected>Month</option>
+                <option value="01" class="hideIf2014">January</option>
+                <option value="02" class="hideIf2014">February</option>
+                <option value="03" class="hideIf2014">March</option>
+                <option value="04" class="hideIf2014">April</option>
+                <option value="05" class="hideIf2014">May</option>
+                <option value="06" class="hideIf2014">June</option>
+                <option value="07" class="hideIf2014">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12" class="hideIf2014">December</option>
+            </select>
+          </div>
+            <button id="btn" onclick="getMarkerFromChosenTime()" class="action-button shadow animate blue">Lets Go!</button>
+        </div>
+        <div id="map"></div>
+    </div>
+</body>
+
+</html>

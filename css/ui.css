@@ -1,0 +1,120 @@
+body,
+html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  margin: 0; }
+
+h1 {
+  font-family: Righteous;
+  color: orange;
+  text-align: center; }
+
+p {
+  font-family: Oswald; }
+
+#side {
+  width: 320px;
+  height: 100%;
+  position: absolute;
+  left: -320px;
+  background-color: rgba(70, 130, 180, 0.8);
+  padding: 24px;
+  z-index: 2;
+  -webkit-box-shadow: 2px 0 2px 0 rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 2px 0 2px 0 rgba(0, 0, 0, 0.75);
+  box-shadow: 2px 0 2px 0 rgba(0, 0, 0, 0.75); }
+  #side:after {
+    content: "";
+    background: url("../steel.jpg");
+    opacity: 0.3;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: 1; }
+
+#inner-text {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  z-index: 3; }
+
+/******************SELECT-HOLDER*******************/
+.selectholder select {
+  z-index: 9;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  border: 0;
+  font-size: 1.3em;
+  height: 2em;
+  -o-transition: 0.1s ease-out;
+  -ms-transition: 0.1s ease-out;
+  -moz-transition: 0.1s ease-out;
+  -webkit-transition: 0.1s ease-out;
+  transition: 0.1s ease-out;
+  cursor: pointer; }
+
+.selectholder {
+  z-index: 9;
+  width: 272px;
+  height: 32px;
+  margin: 20px 0;
+  overflow: hidden;
+  background: url("../pulldown.png") contain; }
+
+/******************MENU-ICON*******************/
+label {
+  font-size: 0;
+  cursor: pointer;
+  position: fixed;
+  left: 9px;
+  top: 12px;
+  z-index: 100; }
+
+input[type='checkbox'] {
+  display: none; }
+  input[type='checkbox']:checked ~ .container .menu {
+    background: transparent; }
+    input[type='checkbox']:checked ~ .container .menu:before {
+      bottom: 0;
+      transform: rotate(45deg); }
+    input[type='checkbox']:checked ~ .container .menu:after {
+      top: 0;
+      transform: rotate(-45deg); }
+
+.container {
+  display: inline-block;
+  width: 30px;
+  height: 23px;
+  position: relative; }
+
+.menu {
+  height: 3px;
+  width: 30px;
+  border-radius: 1.5px;
+  background: white;
+  transition: 0.3s;
+  position: relative;
+  transform: translateY(10px); }
+  .menu:before {
+    height: 3px;
+    width: 30px;
+    border-radius: 1.5px;
+    background: white;
+    transition: 0.3s;
+    content: '';
+    position: absolute;
+    bottom: 10px; }
+  .menu:after {
+    height: 3px;
+    width: 30px;
+    border-radius: 1.5px;
+    background: white;
+    transition: 0.3s;
+    content: '';
+    position: absolute;
+    top: 10px; }
+
+/*# sourceMappingURL=ui.css.map */
