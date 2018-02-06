@@ -9,13 +9,15 @@ Special thanks to the Hackalist guys for maintaining their API so I can grab the
 
 <a href="http://www.hackalist.org/">HACKALIST</a>
 
-Current contributors:
+People who've contributed:
 
 <a href="https://www.github.com/mding5692">Michael Ding</a>
 
 <a href="https://github.com/KevinPayravi">Kevin Payravi</a>
 
 <a href="https://github.com/NeoZhangTCL">Neo Zhang</a>
+
+<a href="https://github.com/Yogendra0Sharma">Yogendra0Sharma</a>
 
 If anyone is interested in joining, please create an issue and post details of what you want to help with and what you're good at - We appreciate all the support we can get!
 
