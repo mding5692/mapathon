@@ -1,6 +1,8 @@
+# PROJECT IS CURRENTLY ON HOLD, THERE WAS A BREAKING CHANGE IN THE GOOGLE MAPS API WE WERE USING SO THE APP ISNT WORKING RIGHT NOW
+
 # mapathon
 
-(UPDATED AS OF AUG-2016)
+(UPDATED AS OF April 2019)
 
 Previously created for the Devpost "Maps As Art" online hackathon submission
 [![Stories in Ready](https://badge.waffle.io/mding5692/mapathon.png?label=ready&title=Ready)](http://waffle.io/mding5692/mapathon)
